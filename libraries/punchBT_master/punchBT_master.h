@@ -24,8 +24,6 @@
 //						count is too slow(too slow master needs to play music or voice to remind player needs to punch quickly)
 //	right arm: master receives "rPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch 
 //						count is too slow(too slow master needs to play music or voice to remind player needs to punch quickly)
-//5.master will check slave transmits data, if master receives data is not complete at a specific time(time out!) 
-//  ,punch receiveData_buf needs to clear.
 //!!use BT module need to pair echo other!!
 //First,you need use AT_mode to pair BT module echo other,please refer to BT_pair document
 //when you pair BT module succeed each other(master and slave),that can receive or transmit data

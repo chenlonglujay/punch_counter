@@ -19,8 +19,6 @@
 //	data format:
 //	left arm: slave transmits "lPUSE." to master ,expresses slave is pause
 //	right arm: slave transmits "rPUSE." to master ,expresses slave is pause
-//5.slave will check master transmits data, if slave receives data is not complete at a specific time(time out!) 
-//  ,punch receiveSeq needs to clear.
 //!!use BT module need to pair echo other!!
 //First,you need use AT_mode to pair BT module echo other,please refer to BT_pair document
 //when you pair BT module succeed each other(master and slave),that can receive or transmit data
