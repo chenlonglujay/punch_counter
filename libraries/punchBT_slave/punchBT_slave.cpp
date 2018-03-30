@@ -54,7 +54,7 @@ void punchBT_slave::AT_mode_function() {
 	}
 }
 
-void punchBT_slave::Slave_mode_transmit() {
+void punchBT_slave::Slave_mode_transmit(bool show_data) {
 	if(punch_pause == pause) {
 			if(dir == right)    
     		BT.print("rPUSE.");
@@ -62,7 +62,7 @@ void punchBT_slave::Slave_mode_transmit() {
     		BT.print("lPUSE.");
 
   } else {
-    arrangeData(transmitData_buf);
+    arrangeData(transmitData_buf, show_data);
     BT.print(transmitData_buf);   
   }  
 }
@@ -101,28 +101,36 @@ bool punchBT_slave::Slave_mode_receive_reset() {
 
 
 //change int data to char
-void punchBT_slave::arrangeData(char *transmit_data_buf) {
+void punchBT_slave::arrangeData(char *transmit_data_buf, bool show_data) {
      int i = 0;
      int buf = transmitData; 
-		 Serial.print("transmitData:");
-		 Serial.println(transmitData);
+		 if(show_data) {
+		 		Serial.print("transmitData:");
+		 		Serial.println(transmitData);
+		 }
      int unit[4] = {1000, 100, 10, 1};
      uint8_t check = 0;
-		 Serial.print("buf[0]:");
-		 Serial.print(transmit_data_buf[0]);
-		 Serial.print("  ");
+		 if(show_data) {
+		 		Serial.print("buf[0]:");
+		 		Serial.print(transmit_data_buf[0]);
+		 		Serial.print("  ");
+		 }
      for(i = 0; i < 4; i++) {        
         transmit_data_buf[i+1]= (buf / unit[i]) + '0';   //int to char
         buf = buf % unit[i];
-				Serial.print("buf");
-				Serial.print("[");
-				Serial.print(i+1);
-				Serial.print("]:");
-				Serial.print(transmit_data_buf[i+1]);
-				Serial.print("  ");
+				if(show_data) {
+						Serial.print("buf");
+						Serial.print("[");
+						Serial.print(i+1);
+						Serial.print("]:");
+						Serial.print(transmit_data_buf[i+1]);
+						Serial.print("  ");
+				}
      }
-		 Serial.print("buf[5]:");
-		 Serial.println(transmit_data_buf[5]);
+		 if(show_data) {
+		 		Serial.print("buf[5]:");
+		 		Serial.println(transmit_data_buf[5]);
+			}
 }
 
 void  punchBT_slave::transmitData_add() {

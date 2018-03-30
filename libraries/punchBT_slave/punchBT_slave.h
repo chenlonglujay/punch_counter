@@ -78,7 +78,7 @@ private:
 	char dir;
 	int transmitData;
 	bool punch_pause;
-	void arrangeData(char *transmit_data_buf);
+	void arrangeData(char *transmit_data_buf, bool show_data);
 public:
 	punchBT_slave();
 	~punchBT_slave();
@@ -90,7 +90,7 @@ public:
 	void set_punch_pause(ch_punch_pause val);
 	void AT_mode_function();
 	bool Slave_mode_receive_reset();
-	void Slave_mode_transmit();
+	void Slave_mode_transmit(bool show_data);
 };
 
 #endif

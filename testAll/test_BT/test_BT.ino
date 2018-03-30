@@ -17,11 +17,15 @@ char val_left;
 //right arm rxxxx. ex:r0888.
 //!!First,you need use AT_Mode to pair BT echo other(master and slave),please refer to BT_pair document!!
 //test step:
-//step1:master receives data(1-10 and pause) from slave
-//step2:master receives  data(11-20 and pause) from slave
-//step3:master transmits reset(lRSET.)to slave
-//step4:slave punch count will be 0, so loop step1
+//step1:master waits for data(punch count) from slave
+//step2:if slave changes mode(puase -> punch),start transmits data(punch count)
+//step3:master receives data(1-5) from slave
+//step4:master receives  data  is 5,transmits reset(lRSET. og rRSET.) to slave
+//step5:slave punch count will be 0 and changes mode(punch -> pause), so loop step1
 punchBT_master punch_BT_R,punch_BT_L;
+bool already_resetL = false;
+bool already_resetR = false;
+
 void setup() {
   Serial.begin(9600);  
 #if AT_Mode
@@ -46,9 +50,14 @@ void loop() {
   if(reL >0 && reL <10000){
      Serial.print("receive val_left: ");
      Serial.println(reL); 
-     if(reL == 20) {
-      Serial.println("master is reset send reset signal to slaveL");
-      punch_BT_L.Master_mode_transmit_reset();
+     if(reL == 5) {
+         if(!already_resetL) {   
+            Serial.println("master is reset send reset signal to slaveL");
+            punch_BT_L.Master_mode_transmit_reset();
+         }
+         already_resetL = true;
+     } else if(reL == 1) {
+         already_resetL = false;
      }
   } else if (reL == 10000){
       Serial.println("slaveL is pause!!");
@@ -58,9 +67,14 @@ void loop() {
  if(reR >0 && reR <10000){
      Serial.print("receive val_right: ");
      Serial.println(reR); 
-     if(reR == 20) {
-      Serial.println("master is reset send reset signal to slaveR");
-      punch_BT_R.Master_mode_transmit_reset();
+     if(reR == 5) {
+       if(!already_resetR) {   
+            Serial.println("master is reset send reset signal to slaveR");
+            punch_BT_R.Master_mode_transmit_reset();
+       }
+        already_resetR = true;
+     } else if(reR == 1) {
+        already_resetR = false;
      }
   } else if (reR == 10000){
       Serial.println("slaveR is pause!!");
