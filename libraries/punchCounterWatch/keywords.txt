@@ -25,6 +25,8 @@ resetPunch			KEYWORD2
 set_start			KEYWORD2
 set_pause			KEYWORD2
 get_start_pause_status	   	KEYWORD2
+get_battery_percent		KEYWORD2
+get_sensitivity_percent		KEYWORD2	
 #######################################
 # Instances (KEYWORD2)
 #######################################

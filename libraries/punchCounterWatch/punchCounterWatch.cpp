@@ -16,14 +16,18 @@ punchCounterWatch::punchCounterWatch(void) {
 	TMSF.minute = 0;
 	TMSF.hour = 0;
 	TMSF.day = 0;
+	save_sensitivity = 0;
 }
 
 punchCounterWatch::~punchCounterWatch(void) {
 }
 
-void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin) {
+void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin
+, uint8_t batteryDetectPin) {
 	count_sensitivity_pin = sensitivityPin;
+	battery_detect_pin = batteryDetectPin;
 	pinMode(sensitivityPin, INPUT);
+	pinMode(batteryDetectPin, INPUT);
 	punchCounter = getPunchCountFromEEPROM();
 	timeCounter = getTimerDataFromEEPROM();
 	punch_count.PunchCounter_initial(SDO_1, s8g, punchCounter);
@@ -127,6 +131,7 @@ unsigned long punchCounterWatch::arrangeTimerDataForRead() {
 
 int punchCounterWatch::getSensitivity() {
 	int val = analogRead(count_sensitivity_pin);	//0-1023
+	save_sensitivity = val;
 	//Serial.print("sensitivity: ");
 	//Serial.println(val);
 	return val;
@@ -164,17 +169,29 @@ void punchCounterWatch::resetPunch() {
 }
 
 void punchCounterWatch::set_start() {
-	start_pause_status = start;
+	start_pause_status = watch_start;
 }
 
 void punchCounterWatch::set_pause() {
-	start_pause_status = pause;
+	start_pause_status = watch_pause;
 }
 
 bool punchCounterWatch::get_start_pause_status() {
 	return start_pause_status;
 }
 
+uint8_t punchCounterWatch::get_battery_percent() {
+	int val = analogRead(battery_detect_pin);	
+	float detect = (float)val / 1023.00;
+	detect = detect *100;
+	val = (int)detect;
+	return val;  
+}
 
-
-
+uint8_t punchCounterWatch::get_sensitivity_percent() {
+	int val = save_sensitivity;
+	float detect = (float)val / 1023.00;
+	detect  = detect * 100;
+	val = (int)detect;
+	return val;
+}

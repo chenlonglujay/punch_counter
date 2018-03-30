@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For Timer Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+OLED_SSD1306	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+fill_screen				KEYWORD2
+initial						KEYWORD2
+display8x16 			KEYWORD2
+display16x16			KEYWORD2
+display128x64			KEYWORD2
+OLED_display_ON		KEYWORD2
+OLED_display_OFF	KEYWORD2
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################

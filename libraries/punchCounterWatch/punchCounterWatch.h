@@ -25,11 +25,12 @@ typedef struct timerSaveFormat{
 	uint8_t second;
 }timerSaveFMT;
 
-enum {pause=0, start};
+enum {watch_pause=0, watch_start};
 class punchCounterWatch
 {
 private:
 	uint8_t count_sensitivity_pin;
+	uint8_t battery_detect_pin;
 	int punchCounter;
 	unsigned long timeCounter;
 	void arrangeTimerDataForSave(unsigned long timeCounter);
@@ -37,12 +38,13 @@ private:
 	timerSaveFMT TMSF;
 	int getSensitivity();
 	bool start_pause_status;
+	int  save_sensitivity;
 public:
 	punchCounterWatch();
 	~punchCounterWatch();
 	int getPunchCountFromEEPROM();
 	void savePunchCountToEEPROM();
-	void punchCounterWatch_initial_set(uint8_t senstivityPin);
+	void punchCounterWatch_initial_set(uint8_t senstivityPin, uint8_t batteryDetectPin);
 	void saveTimerDataToEEPROM();
 	unsigned long getTimerDataFromEEPROM();
 	int getHumanPunchCount();	
@@ -54,6 +56,8 @@ public:
 	void set_start();
 	void set_pause();
 	bool get_start_pause_status();
+	uint8_t get_battery_percent(); 
+	uint8_t get_sensitivity_percent();
 };
 
 #endif
