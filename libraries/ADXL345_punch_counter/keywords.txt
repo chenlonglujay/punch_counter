@@ -14,7 +14,7 @@ ADXL345_PUNCH_COUNTER	KEYWORD1
 
 PunchCounter_initial	KEYWORD2
 get_punch_count		KEYWORD2
-clean_punch_counter	KEYWORD2
+clear_punch_counter	KEYWORD2
 set_measureMode  	KEYWORD2
 set_standbyMode		KEYWORD2
 

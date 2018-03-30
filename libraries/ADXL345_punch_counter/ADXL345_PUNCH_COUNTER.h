@@ -22,7 +22,7 @@ public:
 	~PunchCounter();
 	void PunchCounter_initial(devID dev_id, SG CHGY, int now_punch_counter);
 	int get_punch_count(int tuneSensitivity, bool printSW);
-	void clean_punch_counter();
+	void clear_punch_counter();
 	void set_measureMode();
 	void set_standbyMode();
 };

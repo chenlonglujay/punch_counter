@@ -82,7 +82,7 @@ int PunchCounter::get_punch_count(int tuneSensitivity, bool printSW){
 	delay(5);
 }
 
-void PunchCounter::clean_punch_counter(){
+void PunchCounter::clear_punch_counter(){
 	punch_counter=0;
 }
 
