@@ -6,8 +6,8 @@
 #endif
 
 #include "Wire.h"
-
 #include "OLED_SSD1306.h"
+
 
 OLED_SSD1306::OLED_SSD1306(){
 
@@ -69,16 +69,19 @@ void OLED_SSD1306::display8x16(unsigned char x, unsigned char y, unsigned char N
 	
 	unsigned char wm=0;
 	unsigned int adder=16*N;
+	unsigned char data;
 	IIC_setPos(x , y);
 	for(wm = 0;wm < 8;wm++)
-	{
-		writeData(dp[adder]);
+	{	
+		data = pgm_read_byte_near(dp + adder);
+		writeData(data);
 		adder += 1;
 	}
 	IIC_setPos(x,y + 1);
 	for(wm = 0;wm < 8;wm++)
 	{
-		writeData(dp[adder]);
+		data = pgm_read_byte_near(dp + adder);
+		writeData(data);
 		adder += 1;
 	}
 	
@@ -89,20 +92,22 @@ void OLED_SSD1306::display16x16(unsigned char x, unsigned char y, unsigned char 
 {
   unsigned char wm=0;
   unsigned int adder=32*N;
+  unsigned char data;
   IIC_setPos(x , y); 
   for(wm = 0;wm < 16;wm++)
   {
-    writeData(dp[adder]);
+    data = pgm_read_byte_near(dp + adder);
+	writeData(data);
     adder += 1;
   }
   IIC_setPos(x,y + 1); 
   for(wm = 0;wm < 16;wm++)
   {
-    writeData(dp[adder]);
+    data = pgm_read_byte_near(dp + adder);
+	writeData(data);
     adder += 1;
   }
 }
-
 
 
 
@@ -129,16 +134,21 @@ above all read finished(8 rows),read y direction v
 v
 row63
 */
-void OLED_SSD1306::display128x64(unsigned char x, unsigned char y, unsigned char N, unsigned char *dp)
+void OLED_SSD1306::display128x64(unsigned char *dp) 
 {
-	unsigned char wm=0;
-	unsigned int adder=16*N;
-	IIC_setPos(x , y);
-	for(wm = 0;wm < 16;wm++)
-	{
-		writeData(dp[adder]);
-		adder += 1;
-	}	
+	unsigned int adder = 0;
+	unsigned char data;
+	uint8_t x = 0;
+	uint8_t y = 0;	
+	IIC_setPos(0, 0);
+	for(y = 0; y < 8 ; y++){
+		IIC_setPos(0, y);
+		for(x = 0; x < 128; x++){			
+			data = pgm_read_byte_near(dp + adder);
+			writeData(data);
+			adder += 1;
+		}	
+	}
 }
 
 void OLED_SSD1306::OLED_display_OFF(){

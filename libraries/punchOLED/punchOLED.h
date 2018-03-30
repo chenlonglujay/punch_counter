@@ -52,12 +52,12 @@ class punchOLED:protected OLED_SSD1306
 #endif
 	void showPicture16x16(unsigned char x, unsigned char y, unsigned char N);
 	void showCN(unsigned char x, unsigned char y, unsigned char N);
-
  public:
   punchOLED();
   ~punchOLED();
-	void punchOLED_initial();
- //void showPicture128x64(unsigned char x, unsigned char y, unsigned char N);
+	void punchOLED_initial();	
+	void showPicture128x64_lab();
+	void showPicture128x64_fist();
 	void show_watch_page1(punch_count_OLED *PCOLED, time_save_OLED *TSOLED);
 	void show_watch_page2(bool charge, bool left_right,bool mode, punch_count_OLED *sensitivity);
 	void clear_screen();

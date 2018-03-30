@@ -56,6 +56,14 @@ void punchOLED::showPicture16x16(unsigned char x, unsigned char y, unsigned char
 	display16x16(x, y, N, picture16x16);
 }
 
+void punchOLED::showPicture128x64_lab(){
+	display128x64(Picture_lab);
+}
+
+void punchOLED::showPicture128x64_fist(){
+	display128x64(Picture_fist);
+}
+
 void punchOLED::show_watch_page1(punch_count_OLED *PCOLED, time_save_OLED *TSOLED){
 		uint8_t x_pos16 = 16;
 		uint8_t y_pos = 2;

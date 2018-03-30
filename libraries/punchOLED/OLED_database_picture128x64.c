@@ -6,7 +6,6 @@
 *****************************************************************/
 
 #include <avr/pgmspace.h>
-#define PROGMEM
 
 const char PROGMEM Picture_fist[] = {
 //punch thankfully
