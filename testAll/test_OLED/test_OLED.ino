@@ -1,92 +1,46 @@
 #include <Wire.h>
-#include <CN_SSD1306_Wire.h>
-
-//#include "codetab.c"   //codetab
-
-CN_SSD1306_Wire lucky(8);//HardWare I2C
-
-void setup()
-{
-  lucky.Initial();
-   lucky.Fill_Screen(0xff,0xff);
-  delay(2000);
-  lucky.Fill_Screen(0x00,0x00); 
+#include <punchOLED.h>
+punchOLED punch_OLED;
+void setup(){
+  punch_OLED.punchOLED_initial();
   delay(10);
 }
 
-void loop()
-{
+void loop(){
+  punch_count_OLED *pco = new punch_count_OLED;
+  time_save_OLED *tso = new time_save_OLED;
+  pco->THD = 8;
+  pco->HUD = 7;
+  pco->TEN = 9;
+  pco->ONE = 0;
+
+  tso->day_h = 0;
+  tso->day_l = 1;
+  tso->hour_h = 2;
+  tso->hour_l = 3;
+  tso->minute_h = 4;
+  tso->minute_l = 5;
+  tso->second_h = 0;
+  tso->second_l = 6;
   
-   show_CN();
-  //show_number(); 
-  //show_SSYM(); 
-    //show_picture1();
-    //show_picture2();
-    delay(5000);
-    // lucky.Fill_Screen(0x00,0x00);
-        // delay(10); 
-      lucky.Fill_Screen(0xff,0xff);
-  delay(2000);
-  lucky.Fill_Screen(0x00,0x00); 
- delay(2000);
+  //show page1
+  punch_OLED.clear_screen();
+   punch_OLED.show_watch_page1(pco, tso);
+   delay(2000);
+   
+   //show page2
+   punch_OLED.clear_screen();
+   pco->HUD = 0;
+   pco->TEN = 6;
+   pco->ONE = 5;
+   punch_OLED.show_watch_page2(1,1,1,pco);      //bool not0/charge1,bool left0/right1 watch, bool pause0/start1 mode, punch count sensitivity(0~100%)
+   delay(2000); 
 
+ //show page3 reset
+  punch_OLED.clear_screen();
+  punch_OLED.show_watch_reset();
+   delay(2000); 
+   
+  delete pco;
+  delete tso;
 }
-
-void show_picture1() {
-  unsigned char x,y;
-  unsigned char count=0;
-
-    for(y = 0; y < 8 ; y++){
-      for(x = 0; x < 8 ; x++){
-        lucky.ShowPicture1(x*16, y, count); 
-        count++;                    
-     }
-    }
-}
-
-void show_number() {
-  unsigned char x;
-  unsigned char count=0;
-  for(x = 0; x < 10; x++){
-    lucky.ShowNUM(x*8,0,count);
-    count++;
-  }   
-}
-/*
-void show_ENC() {
-  unsigned char x;
-  unsigned char count=0;
-  for(x = 0; x < 16; x++){
-    lucky.ShowENS(x*8,2,count);
-    count++;
-  }   
-   for(x = 0; x < 11; x++){
-    lucky.ShowENS(x*8,4,count);
-    count++;
-  }   
-}*/
-
-void show_SSYM() {
-  unsigned char x;
-  unsigned char count=0;
-  for(x = 0; x < 16; x++){
-    lucky.ShowSSYM(x*8,2,count);
-    count++;
-  }   
-   for(x = 0; x < 16; x++){
-    lucky.ShowSSYM(x*8,4,count);
-    count++;
-  }   
-}
-void show_CN() {
-  int x=0,y=0;
-  int count=0;
-   for(y=0;y<4;y++){
-      for(x=0;x<8;x++){      
-        lucky.ShowCN(x*16,y*2,count);
-        count++;     
-      }
-   }
-}
-
-
