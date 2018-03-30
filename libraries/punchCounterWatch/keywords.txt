@@ -1,0 +1,34 @@
+#######################################
+# Syntax Coloring Map For Timer Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+punchCounterWatch	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+getPunchCountFromEEPROM		KEYWORD2
+savePunchCountToEEPROM		KEYWORD2
+punchCounterWatch_initial_set	KEYWORD2
+saveTimerDataToEEPROM		KEYWORD2
+getTimerDataFromEEPROM	   	KEYWORD2
+getHumanPunchCount		KEYWORD2
+timer_add_1_second		KEYWORD2
+getTimeData			KEYWORD2
+resetAll			KEYWORD2
+resetTime			KEYWORD2
+resetPunch			KEYWORD2
+set_start			KEYWORD2
+set_pause			KEYWORD2
+get_start_pause_status	   	KEYWORD2
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
