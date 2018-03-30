@@ -3,7 +3,9 @@
 #include <Timer.h>
 #include <ThreadController.h>
 #include <punchBT_slave.h>
-punchBT_slave punch_L;
+#define punch_RL punch_L                 //if this module is right module, please change this parameter become punch_R
+#define left_right left                         //if this module need set right arm module,please change this parameter become right
+punchBT_slave punch_RL;
 punchCounterWatch PH_watch;
 Timer tp;
 
@@ -18,7 +20,7 @@ Thread* Thread_OLED = new Thread();
 
 #define TimerSmallestUnit 100
 #define start_pause_btn_pin 2      
-#define reset_page_btn_pin 3      //reset need push down 3 seconds
+#define reset_page_btn_pin 3      //reset need press button 3 seconds
 
 #define AT_Mode 0       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
 #define slave_Mode 1   //second, use slave_Mode to recrive data from master or transmit data to master
@@ -29,18 +31,38 @@ Thread* Thread_OLED = new Thread();
 #define reset_check_arrive 30             //timer, TimerSmallestUnit  * reset_check_arrive
 #define second_check_arrive 10        //timer, TimerSmallestUnit  * second_check_arrive
 #define battery_check_arrive 300         //timer,  TimerSmallestUnit * battery_check_arrive
+#define tenMin_check_arrive  600      //600s = 10 mintues
 
-int timer_count = 0;
+//change switch  status  of  start/pause button
 bool switchCheck_sp = true;
-bool reset_page_is_start = false;
+
+//first time to press reset/page button
+bool reset_page_is_start = false;    
+
+ //check system is or not executed all reset function
 bool resetAllDone = false;
-int timer_reset_page_count = 0;
+
+//timer count for some event check
+int timer_count = 0;
+int timer_reset_page_count = 0;         //count press button 3 seconds
+
+//when power on avoids system go into reset_page_ISR() function
 bool start_power_on = true;
+
+//save punch count now and before
 int punchCountBF = 0;
 int punchCountNow = 0;
-bool update_once = false;
+
+ //pause mode only save date to eeprom once
+bool update_once = false;        
+
+//check battery
 int battery_count = 0;
 int battery_percent = 0;
+
+//check player is no used watch in 10 minutes,if no used,watch will change mode become pause mode automatically  
+bool autoPause = false;
+unsigned int timer_count_10Min = 0;
 
 void setup() {
   Serial.begin(9600);  
@@ -63,7 +85,12 @@ void timerEvent() {
                 if(timer_count == second_check_arrive) {
                       //TimerSmallestUnit *second_check_arrive = 1 second
                       PH_watch.timer_add_1_second();
-                      update_punch_timer();
+                      update_punch_timer();                 
+                      timer_count_10Min++;     
+                      if((timer_count_10Min >= tenMin_check_arrive) && autoPause) {
+                           transmit_pause(&punch_RL);         //change mode become to pause mode
+                           clear_auto_pasue();
+                      }
                 }              
           } else {    
               if(update_once) { 
@@ -71,8 +98,7 @@ void timerEvent() {
               }
               update_once = false;
           }         
-            arrange_reset_page();      
-         
+          arrange_reset_page();          
           check_battery_percent();
 }
 
@@ -104,7 +130,8 @@ void arrange_reset_page() {
               } else if (!reset_page_is_start && timer_reset_page_count != 0) {
                     if(!resetAllDone) {
                       //after resetAll finished ,avoids into changing page                      
-                        Serial.println("changing page");                                
+                        Serial.println("changing page");       
+                         //punchCountNow++;         //ivan test                        
                          timer_reset_page_count = 0;          
                     }
                     resetAllDone = false;
@@ -117,12 +144,10 @@ void reset_data_count() {
            Serial.println("resetAll");
            timer_reset_page_count = 0;
            resetAllDone = true;                                                          
-           reset_data(&punch_L);                        //transmit count=0
-           transmit_data(&punch_L, 0, false);            
-           PH_watch.set_pause();           //work likes pause mode
-           transmit_puse(&punch_L);    
+           reset_data(&punch_RL);                        //transmit count=0
+           transmit_data(&punch_RL, 0, false);          
+           transmit_pause(&punch_RL);               //change mode become to pause mode
            update_once = true;
-           switchCheck_sp = watch_start;       //next push start/pause button down will go into start  
 }
 
 void interrupt_initial() {
@@ -152,13 +177,13 @@ void start_pause_ISR() {
                     //Serial.println("start");
                     digitalWrite(start_pause_LED_pin, LOW);     //LED ON
                     PH_watch.set_start();
+                    switchCheck_sp = watch_pause;       //next push start/pause button down will go into pause
                 } else if(switchCheck_sp == watch_pause)  {
-                   //Serial.println("pause");
+                   //jSerial.println("pause");
                    digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
-                   PH_watch.set_pause();
+                   transmit_pause(&punch_RL);         //change mode become to pause mode
                    update_once = true;
                 }
-                switchCheck_sp = !switchCheck_sp;
             }
             last_interrupt_time = interrupt_time;
 }
@@ -179,9 +204,9 @@ void showTimeData() {
 
 void punchCounter_initial() {
 #if AT_Mode
-        punch_L.punchBT_slave_initial_set(AT_mode, left);         
+        punch_RL.punchBT_slave_initial_set(AT_mode, left_right);         
 #else slave_Mode  
-        punch_L.punchBT_slave_initial_set(Slave_mode, left);       //if this module need set right arm module,please type argument 2 is right
+        punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);       
         battery_percent = PH_watch.get_battery_percent();
         digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
 #endif  
@@ -207,12 +232,12 @@ void thread_initial() {
 }
 
 void BT_transmit() {
-  get_count_transmitData(&puncqh_L);
+  get_count_transmitData(&punch_RL);
 }
 
 void BT_receive() {
   bool receive_status;
-  receive_status = punch_L.Slave_mode_receive_reset();
+  receive_status = punch_RL.Slave_mode_receive_reset();
   if(receive_status == reset_yes){
     reset_data_count();
   }
@@ -228,13 +253,18 @@ void get_count_transmitData(punchBT_slave *input) {
           sensitivity = PH_watch.get_sensitivity_percent();
          //Serial.print("sensitivity: ");
          //Serial.println(sensitivity);
-        //if(punchCountNow > punchCountBF) {
-               if(input->get_transmitData() == 9999) { 
-                       reset_data(input);
-                }
-                transmit_data(input, punchCountNow, show_data);
-        //}
-         punchCountBF = punchCountNow;
+         
+        if(punchCountNow > punchCountBF) {
+            clear_auto_pasue();
+        } else if (punchCountNow == punchCountBF)  {
+            autoPause = true;
+        }
+                
+        if(input->get_transmitData() == 9999) { 
+             reset_data(input);
+         }
+        transmit_data(input, punchCountNow, show_data);        
+        punchCountBF = punchCountNow;
     } else {      
       //Serial.println("puase");
     }
@@ -254,10 +284,16 @@ void transmit_data(punchBT_slave *input, int count, bool show_data) {
       input->Slave_mode_transmit(show_data);    
 }
 
-void transmit_puse(punchBT_slave *input) {
+void transmit_pause(punchBT_slave *input) {
+     PH_watch.set_pause();                      //work likes pause mode     
      input->set_punch_pause(pause);
      input->Slave_mode_transmit(false);          
      digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
+     switchCheck_sp = watch_start;       //next push start/pause button down will go into start  
 }
 
+void clear_auto_pasue() {
+  autoPause = false;
+  timer_count_10Min = 0;
+}
 
