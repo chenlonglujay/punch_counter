@@ -73,7 +73,7 @@ void arrange_reset_page() {
                             resetAllDone = true;
                             PH_watch.set_pause();           //work like pause mode
                             update_once = true;
-                            switchCheck_sp = start;       //next push start/pause button down will go into start
+                            switchCheck_sp = watch_start;       //next push start/pause button down will go into start
                     } 
               } else if (!reset_page_is_start && timer_reset_page_count != 0) {
                     if(!resetAllDone) {
@@ -110,10 +110,10 @@ void start_pause_ISR() {
             static unsigned long last_interrupt_time = 0;
             unsigned long interrupt_time = millis();
             if(interrupt_time - last_interrupt_time > 200) {
-                if(switchCheck_sp == start) {
+                if(switchCheck_sp == watch_start) {
                     Serial.println("start");
                     PH_watch.set_start();
-                } else if(switchCheck_sp == pause)  {
+                } else if(switchCheck_sp == watch_pause)  {
                    Serial.println("pause");
                    PH_watch.set_pause();
                    update_once = true;
