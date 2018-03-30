@@ -1,0 +1,38 @@
+#######################################
+# Syntax Coloring Map For Timer Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ADXL345	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+ADXL345_initial_set	KEYWORD2
+enableMeasureMode	KEYWORD2
+enableStandbyMode	KEYWORD2
+get_xyzAxis_org	   	KEYWORD2
+get_xyzAxis_gravity	KEYWORD2
+
+show_xAxis_org		KEYWORD2
+show_xAxis_gravity	KEYWORD2
+
+show_yAxis_org		KEYWORD2
+show_yAxis_gravity	KEYWORD2
+
+show_zAxis_org		KEYWORD2
+show_zAxis_gravity	KEYWORD2
+
+show_xyzAxis_org	KEYWORD2	
+show_xyzAxis_gravity	KEYWORD2
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################

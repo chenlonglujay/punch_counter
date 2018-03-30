@@ -1,0 +1,27 @@
+#######################################
+# Syntax Coloring Map For Timer Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+ADXL345_PUNCH_COUNTER	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+PunchCounter_initial	KEYWORD2
+get_punch_count		KEYWORD2
+clean_punch_counter	KEYWORD2
+set_measureMode  	KEYWORD2
+set_standbyMode		KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
