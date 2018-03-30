@@ -1,0 +1,25 @@
+#######################################
+# Syntax Coloring Map For Timer Library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+punchBT_master	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+punchBT_master_initial_set	KEYWORD2
+AT_mode_function 	KEYWORD2
+Master_mode_receive	KEYWORD2
+Master_mode_transmit_reset KEYWORD2
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################

@@ -1,0 +1,41 @@
+配對藍牙動作順序
+
+準備硬體
+master
+arduino Mega 2560 + BT
+
+slave 
+arduino pro mini +BT
+
+
+slave端燒錄程式test_BT_slave
+程式選擇
+test_BT_slave
+#define AT_Mode 0
+#define slave_Mode 1
+1.slave BT按住按鈕 上電3.3V,需看到BT模組紅燈慢慢閃才算進入AT mode
+2.打開arduino IDE ,選Serial Monitor
+3.輸入AT,等待回應OK
+4.設定為預設,輸入AT+ORGL
+5.設定BT為slave,輸入AT+ROLE=0
+6.輸入AT+ROLE? 觀察回傳是否是+ROLE=0
+7.輸入AT+ADDR? 紀錄下回傳數值 等等要配給master
+ex：+ADDR:98d3:34:9085bd--->記下9085bd
+
+
+master端燒錄程式test_BT
+程式選擇
+test_BT
+#define AT_Mode 0
+#define master_Mode 1
+1.Master BT按住按鈕 上電3.3V,需看到BT模組紅燈慢慢閃才算進入AT mode
+2.Slave BT 上電
+3.Master打開arduino IDE ,選Serial Monitor
+4.輸入AT,等待回應OK
+5.設定為預設，輸入AT+ORGL
+6.設定BT為master,輸入AT+ROLE=1
+7.輸入AT+ROLE? 觀察回傳是否是+ROLE=1
+8.輸入AT+BIND=98d3,34,9085bd
+9.輸入AT+BIND? 觀察回傳是否是+BIND=98d3:34:9085bd
+
+ 
