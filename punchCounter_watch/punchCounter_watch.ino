@@ -22,8 +22,8 @@ Thread* Thread_OLED = new Thread();
 #define start_pause_btn_pin 2      
 #define reset_page_btn_pin 3      //reset need press button 3 seconds
 
-#define AT_Mode 0       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
-#define slave_Mode 1   //second, use slave_Mode to recrive data from master or transmit data to master
+#define AT_Mode 1       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
+#define slave_Mode 0   //second, use slave_Mode to recrive data from master or transmit data to master
 
 #define sensitivity_pin A0
 #define start_pause_LED_pin 4       //start led ON, pause led OFF 
@@ -66,17 +66,23 @@ unsigned int timer_count_10Min = 0;
 
 void setup() {
   Serial.begin(9600);  
+  punchCounter_initial();
+#if slave_Mode   
   PH_watch.punchCounterWatch_initial_set(sensitivity_pin, battery_detect_pin);
   pinMode(start_pause_LED_pin, OUTPUT);
-  tp.every(TimerSmallestUnit,timerEvent);  
-  punchCounter_initial();
+  tp.every(TimerSmallestUnit,timerEvent);    
   interrupt_initial();
   thread_initial();
+ #endif  
 }
 
 void loop() {   
+#if AT_Mode  
+        punch_RL.AT_mode_function();
+#else if slave_Mode    
   controll.run();
   tp.update(); 
+ #endif
 }
 
 void timerEvent() {          
@@ -205,6 +211,7 @@ void showTimeData() {
 void punchCounter_initial() {
 #if AT_Mode
         punch_RL.punchBT_slave_initial_set(AT_mode, left_right);         
+          Serial.println("AT_mode");
 #else slave_Mode  
         punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);       
         battery_percent = PH_watch.get_battery_percent();
@@ -247,7 +254,7 @@ void get_count_transmitData(punchBT_slave *input) {
   bool show_data = false;
  int sensitivity;
   if(PH_watch.get_start_pause_status()){       
-        punchCountNow  = PH_watch.getHumanPunchCount();
+        punchCountNow  = PH_watch.getHumanPunchCount();       
          //Serial.print("punchCount: ");
          //Serial.println(punchCountNow);
           sensitivity = PH_watch.get_sensitivity_percent();

@@ -9,7 +9,6 @@
 #include <punchBT_master.h>
 #define AT_Mode 0
 #define Master_Mode 1
-#define showlog 1
 char val_right;
 char val_left;
 //data format 
@@ -31,7 +30,7 @@ void setup() {
 #if AT_Mode
   Serial.println("enter AT commands");
   punch_BT_R.punchBT_master_initial_set(serial2, AT_mode,right);
-  punch_BT_L.punchBT_master_initial_set(serial1, AT_mode,left);
+  //punch_BT_L.punchBT_master_initial_set(serial1, AT_mode,left);
 #else if   Master_Mode
  Serial.println("receive_Mode");
  punch_BT_R.punchBT_master_initial_set(serial2, Master_mode,right);
@@ -41,9 +40,8 @@ void setup() {
 
 void loop() {
  #if AT_Mode  
-    AT_Mode_function();
     punch_BT_R.AT_mode_function();
-    punch_BT_L.AT_mode_function();
+    //punch_BT_L.AT_mode_function();
  #else if receive_Mode
 
   int reL = punch_BT_L.Master_mode_receive();
@@ -81,5 +79,6 @@ void loop() {
   }
  #endif
 }
+
 
 

@@ -12,9 +12,9 @@ SemaphoreHandle_t xSerialSemaphore;
 #include <punchBT_slave.h>
 punchBT_slave punch_L;
 
-#define AT_Mode 0       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
-#define slave_Mode 1   //second, use slave_Mode to recrive data from master or transmit data to master
-
+#define AT_Mode 1       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
+#define slave_Mode 0   //second, use slave_Mode to recrive data from master or transmit data to master
+#define showLOG 1
 
 void setup() {
   Serial.begin(9600);
@@ -23,7 +23,7 @@ void setup() {
         punch_L.punchBT_slave_initial_set(AT_mode, left);         
 #else slave_Mode  
         punch_L.punchBT_slave_initial_set(Slave_mode, left);       //if this module need set right arm module,please type argument 2 is right
-#endif
+
 
   if ( xSerialSemaphore == NULL )  {
       // Check to confirm that the Serial Semaphore has not already been created.
@@ -48,10 +48,13 @@ void setup() {
     ,  NULL
     ,  1  // Priority
     ,  NULL );
-  
+#endif  
 }
 
 void loop() {
+#if AT_Mode  
+      punch_L.AT_mode_function();
+ #endif 
 }
 
 
@@ -74,11 +77,11 @@ void TaskSerialRead( void *pvParameters __attribute__((unused)) )  // This is a 
 
 void TaskSerialSend( void *pvParameters __attribute__((unused)) ) { // This is a Task.
     for (;;)  {
-#if AT_Mode  
-        punch_L.AT_mode_function();
-#else if slave_Mode
+//#if AT_Mode  
+        //punch_L.AT_mode_function();
+//#else if slave_Mode
        transmitDataTest(&punch_L); 
- #endif
+// #endif
       vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
@@ -94,10 +97,10 @@ void transmitDataTest(punchBT_slave *input) {
        if(input->get_transmitData() == 9999) { 
              input->set_transmitData(0);  
        }
-        input->Slave_mode_transmit();  
+        input->Slave_mode_transmit(showLOG);  
        if(input->get_transmitData() % 10 == 0) {       
              input->set_punch_pause(pause);  
-             input->Slave_mode_transmit();           
+             input->Slave_mode_transmit(showLOG);           
        }
         delay(1000);
 }
