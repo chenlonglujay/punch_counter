@@ -31,48 +31,129 @@ void Segment7_2p3inch_PH::setPin_com(uint8_t *com_pin){
   	}  
 }
 
-void Segment7_2p3inch_PH::divide_and_output(int input_value_R, int input_value_L, uint8_t word_R, uint8_t word_L){
+void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R, seg_show word_L, seg_show word_R){
   uint8_t dis[com_num];
   uint8_t value; 
   
-  if(word_R == 0){
+  if(word_R == seg_num){
     for (int i = 0; i < com_num/2; i++) {
         dis[i] = input_value_R % 10;
         input_value_R = input_value_R / 10;
     }
-  } else if (word_R == 1) {
+  } else if (word_R == seg_done) {
         //donE = done
-        dis[0] =0X0D;
-        dis[1] =0X0C;
-        dis[2] =0X0B;
-        dis[3] =0X0A;
-  } else if (word_R == 2) { 
+        dis[3] = sword_d;
+        dis[2] = sword_o;
+        dis[1] = sword_n;
+        dis[0] = sword_E;
+  } else if (word_R == seg_pause) { 
         //PAUE = pause
-        dis[0] =0X0D;
-        dis[1] =0X10;
-        dis[2] =0X0F;
-        dis[3] =0X0E;
-  }
+        dis[3] = sword_P;
+        dis[2] = sword_A;
+        dis[1] = sword_U;
+        dis[0] = sword_E;
+  } else if (word_R == seg_goal_xxxn){
+        //units digit
+        dis[3] = snum_0_word_O;
+        dis[2] = snum_0_word_O;
+        dis[1] = snum_0_word_O;
+        uint8_t num = input_value_R%1000;
+        dis[0] = num;
+  } else if (word_R == seg_goal_xxxd){
+        //units digit dark
+        dis[3] = snum_0_word_O;
+        dis[2] = snum_0_word_O;
+        dis[1] = snum_0_word_O;
+        dis[0] = sall_dark;
+  } else if (word_R == seg_goal_xxnx){
+        //tens digit
+        dis[3] = snum_0_word_O;
+        dis[2] = snum_0_word_O;
+        uint8_t num = input_value_R/10;
+        dis[1] = num;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_goal_xxdx){
+        //tens digit dark
+        dis[3] = snum_0_word_O;
+        dis[2] = snum_0_word_O;
+        dis[1] = sall_dark;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_goal_xnxx){
+        // hundreds digit
+        dis[3] = snum_0_word_O;
+        uint8_t num = input_value_R/100;
+        dis[2] = num;
+        dis[1] = snum_0_word_O;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_goal_xdxx){
+        // hundreds digit dark
+        dis[3] = snum_0_word_O;
+        dis[2] = sall_dark;
+        dis[1] = snum_0_word_O;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_goal_nxxx){
+        // thousands digit
+        uint8_t num = input_value_R/1000;
+        dis[3] = num;
+        dis[2] = snum_0_word_O;
+        dis[1] = snum_0_word_O;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_goal_dxxx){
+        // thousands digit dark
+        dis[3] = sall_dark;
+        dis[2] = snum_0_word_O;
+        dis[1] = snum_0_word_O;
+        dis[0] = snum_0_word_O;
+  } else if (word_R == seg_reset){
+        dis[3] = snum_4_word_y;
+        dis[2] = sall_dark;
+        dis[1] = sword_n;
+        dis[0] = sall_dark;
+  } else if (word_R == seg_all_7seg_dark) {
+        dis[3] = sall_dark;
+        dis[2] = sall_dark;
+        dis[1] = sall_dark;
+        dis[0] = sall_dark;
+  } 
 
-  if(word_L == 0){
+  if(word_L == seg_num){
     for (int i = 4; i < com_num; i++) {
         dis[i] = input_value_L % 10;
         input_value_L = input_value_L / 10;
     }
-  } else if (word_L == 1) {
+  } else if (word_L == seg_done) {
         //donE = done
-        dis[4] =0X0D;
-        dis[5] =0X0C;
-        dis[6] =0X0B;
-        dis[7] =0X0A;
-  } else if (word_L == 2) { 
+        dis[7] = sword_d;
+        dis[6] = sword_o;
+        dis[5] = sword_n;
+        dis[4] = sword_E;
+  } else if (word_L == seg_pause) { 
         //PAUE = pause
-        dis[4] =0X0D;
-        dis[5] =0X10;
-        dis[6] =0X0F;
-        dis[7] =0X0E;
-  }  
+        dis[7] = sword_P;
+        dis[6] = sword_A;
+        dis[5] = sword_U;
+        dis[4] = sword_E;
+  } else if (word_L == seg_goal) {
+        dis[7] = sword_G;
+        dis[6] = snum_0_word_O;
+        dis[5] = sword_A;
+        dis[4] = sword_L;
+  } else if (word_L == seg_reset){
+        //reset = rESt
+        dis[7] = sword_r;
+        dis[6] = sword_E;
+        dis[5] = snum_5_word_S;
+        dis[4] = sword_t;
+  } else if (word_L == seg_all_7seg_dark) {
+        dis[7] = sall_dark;
+        dis[6] = sall_dark;
+        dis[5] = sall_dark;
+        dis[4] = sall_dark;
+  } 
 
+
+    
+    //display
   for (int i = 0; i < com_num; i++) {
     digitalWrite(latchPin, LOW);
     value = pgm_read_byte_near(SEG7 + dis[i]);    //read data from Flash that give SRAM to use 
