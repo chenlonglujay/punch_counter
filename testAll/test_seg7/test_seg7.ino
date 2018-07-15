@@ -62,11 +62,15 @@
 //1sec refresh
 //GOAL(L)
 //d000(R) dark
+
+//function13: 
+//GOAL(L)
+//9998(R)
 //--------------------------------------
 #include <Segment7_2p3inch_PH.h>
 #include <Timer.h>
 #define TimerSmallestUnit 100 //ms
-uint8_t function_set = 12; //test function
+uint8_t function_set = 13; //test function
 
 Segment7_2p3inch_PH s7;
 Timer t1;
@@ -136,6 +140,9 @@ void loop() {
      break;
     case 12:
       s7.divide_and_output(0, 4000, seg_goal, S7RW);   
+     break;
+     case 13:
+      s7.divide_and_output(0, 9998, seg_goal, seg_goal);   
      break;
   }
 }

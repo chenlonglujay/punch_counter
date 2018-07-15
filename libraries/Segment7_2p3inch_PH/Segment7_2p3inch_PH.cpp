@@ -52,6 +52,12 @@ void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R
         dis[2] = sword_A;
         dis[1] = sword_U;
         dis[0] = sword_E;
+  } else if(word_R == seg_goal) {
+     for (int i = 0; i < com_num/2; i++) {
+        dis[i] = input_value_R % 10;
+        input_value_R = input_value_R / 10;
+    }
+ 
   } else if (word_R == seg_goal_xxxn){
         //units digit
         dis[3] = snum_0_word_O;
