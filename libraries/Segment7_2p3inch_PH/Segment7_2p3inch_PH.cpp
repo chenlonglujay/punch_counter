@@ -36,10 +36,7 @@ void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R
   uint8_t value; 
   
   if(word_R == seg_num){
-    for (int i = 0; i < com_num/2; i++) {
-        dis[i] = input_value_R % 10;
-        input_value_R = input_value_R / 10;
-    }
+    cul_display_number(input_value_R, dis, com_num/2, 0); 
   } else if (word_R == seg_done) {
         //donE = done
         dis[3] = sword_d;
@@ -53,73 +50,33 @@ void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R
         dis[1] = sword_U;
         dis[0] = sword_E;
   } else if(word_R == seg_goal) {
-     for (int i = 0; i < com_num/2; i++) {
-        dis[i] = input_value_R % 10;
-        input_value_R = input_value_R / 10;
-    }
- 
-  } else if (word_R == seg_goal_xxxn){
-        //units digit
-        dis[3] = snum_0_word_O;
-        dis[2] = snum_0_word_O;
-        dis[1] = snum_0_word_O;
-        uint8_t num = input_value_R%1000;
-        dis[0] = num;
+     cul_display_number(input_value_R, dis, com_num/2, 0); 
   } else if (word_R == seg_goal_xxxd){
         //units digit dark
-        dis[3] = snum_0_word_O;
-        dis[2] = snum_0_word_O;
-        dis[1] = snum_0_word_O;
-        dis[0] = sall_dark;
-  } else if (word_R == seg_goal_xxnx){
-        //tens digit
-        dis[3] = snum_0_word_O;
-        dis[2] = snum_0_word_O;
-        uint8_t num = input_value_R/10;
-        dis[1] = num;
-        dis[0] = snum_0_word_O;
+        cul_display_number(input_value_R, dis, com_num/2, 0); 
+        dis[0] = sdark;
   } else if (word_R == seg_goal_xxdx){
         //tens digit dark
-        dis[3] = snum_0_word_O;
-        dis[2] = snum_0_word_O;
-        dis[1] = sall_dark;
-        dis[0] = snum_0_word_O;
-  } else if (word_R == seg_goal_xnxx){
-        // hundreds digit
-        dis[3] = snum_0_word_O;
-        uint8_t num = input_value_R/100;
-        dis[2] = num;
-        dis[1] = snum_0_word_O;
-        dis[0] = snum_0_word_O;
+        cul_display_number(input_value_R, dis, com_num/2, 0); 
+        dis[1] = sdark;
   } else if (word_R == seg_goal_xdxx){
         // hundreds digit dark
-        dis[3] = snum_0_word_O;
-        dis[2] = sall_dark;
-        dis[1] = snum_0_word_O;
-        dis[0] = snum_0_word_O;
-  } else if (word_R == seg_goal_nxxx){
-        // thousands digit
-        uint8_t num = input_value_R/1000;
-        dis[3] = num;
-        dis[2] = snum_0_word_O;
-        dis[1] = snum_0_word_O;
-        dis[0] = snum_0_word_O;
+        cul_display_number(input_value_R, dis, com_num/2, 0); 
+        dis[2] = sdark;
   } else if (word_R == seg_goal_dxxx){
         // thousands digit dark
-        dis[3] = sall_dark;
-        dis[2] = snum_0_word_O;
-        dis[1] = snum_0_word_O;
-        dis[0] = snum_0_word_O;
+        cul_display_number(input_value_R, dis, com_num/2, 0); 
+        dis[3] = sdark;
   } else if (word_R == seg_reset){
         dis[3] = snum_4_word_y;
-        dis[2] = sall_dark;
+        dis[2] = sdark;
         dis[1] = sword_n;
-        dis[0] = sall_dark;
+        dis[0] = sdark;
   } else if (word_R == seg_all_7seg_dark) {
-        dis[3] = sall_dark;
-        dis[2] = sall_dark;
-        dis[1] = sall_dark;
-        dis[0] = sall_dark;
+        dis[3] = sdark;
+        dis[2] = sdark;
+        dis[1] = sdark;
+        dis[0] = sdark;
   } 
 
   if(word_L == seg_num){
@@ -151,10 +108,10 @@ void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R
         dis[5] = snum_5_word_S;
         dis[4] = sword_t;
   } else if (word_L == seg_all_7seg_dark) {
-        dis[7] = sall_dark;
-        dis[6] = sall_dark;
-        dis[5] = sall_dark;
-        dis[4] = sall_dark;
+        dis[7] = sdark;
+        dis[6] = sdark;
+        dis[5] = sdark;
+        dis[4] = sdark;
   } 
 
 
@@ -181,7 +138,13 @@ void Segment7_2p3inch_PH::divide_and_output(int input_value_L, int input_value_R
 }
 
 
-
+void Segment7_2p3inch_PH::cul_display_number(int value, uint8_t *dis, uint8_t max, uint8_t min) {
+ int input_value = value;
+ for (int i = min; i < max; i++) {
+         dis[i] = input_value % 10;
+          input_value = input_value / 10;
+  }        
+} 
 
 
 

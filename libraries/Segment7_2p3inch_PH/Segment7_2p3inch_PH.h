@@ -67,20 +67,16 @@ enum {
     sword_L,
     sword_r,
     sword_t,
-    sall_dark
+    sdark
     };
 typedef enum show{
      seg_num = 0
     ,seg_done
     ,seg_pause
     ,seg_goal
-    ,seg_goal_xxxn  //number
     ,seg_goal_xxxd  //dark
-    ,seg_goal_xxnx
     ,seg_goal_xxdx
-    ,seg_goal_xnxx
     ,seg_goal_xdxx
-    ,seg_goal_nxxx
     ,seg_goal_dxxx
     ,seg_reset
     ,seg_all_7seg_dark
@@ -98,6 +94,7 @@ public:
   	void setPin_7seg(uint8_t SER,uint8_t RCLK, uint8_t SRCLK);  
   	void setPin_com(uint8_t *com_pin);		
  	void divide_and_output(int input_value_L, int input_value_R, seg_show word_L, seg_show word_R);
+    void cul_display_number(int value, uint8_t *dis, uint8_t max, uint8_t min);
 };
 
 #endif

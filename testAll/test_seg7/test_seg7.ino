@@ -16,61 +16,45 @@
 //done(R)
 
 //function4:
-//GOAL(L)
-//0008(R)
-
-//function5:
-//GOAL(L)
-//0070(R)
-
-//function6:
-//GOAL(L)
-//0600(R)
-
-//function7:
-//GOAL(L)
-//5000(R)
-
-//function8:
 //rESt(L)
 //yxnx(R)
 
-//function9: blink
+//function5: blink
 //GOAL(L)
-//0001(R)
+//4321(R)
 //1sec refresh
 //GOAL(L)
-//000d(R) dark
+//432d(R) dark
 
-//function10: blink
+//function6: blink
 //GOAL(L)
-//0020(R)
+//3210(R)
 //1sec refresh
 //GOAL(L)
-//00d0(R) dark
+//32d0(R) dark
 
-//function11: blink
+//function7: blink
 //GOAL(L)
-//0300(R)
+//8765(R)
 //1sec refresh
 //GOAL(L)
-//0d00(R) dark
+//8d65(R) dark
 
-//function12: blink
+//function8: blink
 //GOAL(L)
-//4000(R)
+//4567(R)
 //1sec refresh
 //GOAL(L)
-//d000(R) dark
+//d567(R) dark
 
-//function13: 
+//function9: 
 //GOAL(L)
 //9998(R)
 //--------------------------------------
 #include <Segment7_2p3inch_PH.h>
 #include <Timer.h>
 #define TimerSmallestUnit 100 //ms
-uint8_t function_set = 13; //test function
+uint8_t function_set = 1; //test function 1~9
 
 Segment7_2p3inch_PH s7;
 Timer t1;
@@ -114,34 +98,22 @@ void loop() {
      case 3:
       s7.divide_and_output(0, 0,  seg_pause, seg_done);   
      break;  
-     case 4:
-      s7.divide_and_output(0, 8,  seg_goal, seg_goal_xxxn);   
-     break;  
-     case 5:
-      s7.divide_and_output(0, 70,  seg_goal, seg_goal_xxnx);   
-     break;  
-     case 6:
-      s7.divide_and_output(0, 600,  seg_goal, seg_goal_xnxx);   
-     break;  
-     case 7:
-      s7.divide_and_output(0, 5000,  seg_goal, seg_goal_nxxx);   
-     break;  
-    case 8:
+    case 4:
       s7.divide_and_output(0, 0,  seg_reset, seg_reset);   
      break;  
-    case 9:
-      s7.divide_and_output(0, 1, seg_goal, S7RW);   
+    case 5:
+      s7.divide_and_output(0, 4321, seg_goal, S7RW);   
      break;  
-    case 10:
-      s7.divide_and_output(0, 20, seg_goal, S7RW);   
+    case 6:
+      s7.divide_and_output(0, 3210, seg_goal, S7RW);   
      break;  
-    case 11:
-      s7.divide_and_output(0, 300, seg_goal, S7RW);   
+    case 7:
+      s7.divide_and_output(0, 8765, seg_goal, S7RW);   
      break;
-    case 12:
-      s7.divide_and_output(0, 4000, seg_goal, S7RW);   
+    case 8:
+      s7.divide_and_output(0, 4567, seg_goal, S7RW);   
      break;
-     case 13:
+     case 9:
       s7.divide_and_output(0, 9998, seg_goal, seg_goal);   
      break;
   }
@@ -157,17 +129,17 @@ void timerEvent() {
          function1_L();
          function1_R();
         break;
-        case 9:
-          function9();
+        case 5:
+          function5();
         break;
-           case 10:
-          function10();
+           case 6:
+          function6();
         break;
-           case 11:
-          function11();
+           case 7:
+          function7();
         break;
-           case 12:
-          function12();
+           case 8:
+          function8();
         break;
       }
  
@@ -176,14 +148,14 @@ void timerEvent() {
 }
 
 void function1_L() {
-  
+  //0000->1111->...->9999->donE->PAUE->all dark->rESt
   if (S7L == 9999) {
         S7LW++;
-        if(S7LW>2 && S7LW<13) {
-          S7LW = 13;   //all dark
-        } else if(S7LW  == 14) {
-          S7LW = 12;   //reset
-        } else  if(S7LW  == 13) {
+        if(S7LW>2 && S7LW<seg_all_7seg_dark) {
+          S7LW = seg_all_7seg_dark;   //all dark
+        } else if(S7LW  == (seg_all_7seg_dark+1)) {
+          S7LW = seg_reset;   //reset
+        } else  if(S7LW  == seg_all_7seg_dark) {
           S7LW = 0;
           S7L = 0;
          }
@@ -193,14 +165,14 @@ void function1_L() {
 }
 
 void function1_R() {
-  
+    //0000->1111->...->9999->donE->PAUE->all dark->rESt
   if (S7R == 9999) {
         S7RW++;
-        if(S7RW>2 && S7RW<13) {
-          S7RW = 13;   //all dark
-         } else if(S7RW == 14) {
-          S7RW = 12;   //reset
-         }else if(S7RW  == 13) {
+        if(S7RW>seg_pause && S7RW<seg_all_7seg_dark) {
+          S7RW = seg_all_7seg_dark;   //all dark
+         } else if(S7RW == (seg_all_7seg_dark+1)) {
+          S7RW = seg_reset;   //reset
+         }else if(S7RW  == seg_all_7seg_dark) {
           S7RW = 0;
           S7R= 0;
          }
@@ -209,37 +181,37 @@ void function1_R() {
    }    
 }
 
-void function9() {
+void function5() {
     seg_change = !seg_change;
      if(seg_change == 0 ){
-      S7RW = seg_goal_xxxn;
+      S7RW = seg_num;
      } else {
       S7RW = seg_goal_xxxd;
      }  
 }
 
-void function10() {
+void function6() {
     seg_change = !seg_change;
      if(seg_change == 0 ){
-      S7RW = seg_goal_xxnx;
+      S7RW = seg_num;
      } else {
       S7RW = seg_goal_xxdx;
      }  
 }
 
-void function11() {
+void function7() {
     seg_change = !seg_change;
      if(seg_change == 0 ){
-      S7RW = seg_goal_xnxx;
+      S7RW = seg_num;
      } else {
       S7RW = seg_goal_xdxx;
      }  
 }
 
-void function12() {
+void function8() {
     seg_change = !seg_change;
      if(seg_change == 0 ){
-      S7RW = seg_goal_nxxx;
+      S7RW = seg_num;
      } else {
       S7RW = seg_goal_dxxx;
      }  
