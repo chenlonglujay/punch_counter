@@ -23,7 +23,11 @@ transmitData_dec						KEYWORD2
 set_transmitData						KEYWORD2
 get_transmitData						KEYWORD2
 set_punch_pause							KEYWORD2
-	
+get_goal_value				KEYWORD2
+Slave_mode_receive_goal_or_reset	KEYWORD2	
+deal_with_reset_event			KEYWORD2
+deal_with_goal_event			KEYWORD2
+
 #######################################
 # Instances (KEYWORD2)
 #######################################

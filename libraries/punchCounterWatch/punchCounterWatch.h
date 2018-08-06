@@ -18,6 +18,21 @@
 #define PUNCHCOUNTERWATCH_h
 #include <ADXL345_PUNCH_COUNTER.h>
 #include <EEPROM.h>
+#define counter_max 9999
+#define page_counter_max 3
+#define punch_goal_default 4999
+
+enum EEPROM_save_address {
+    punch_counterL = 0,
+    punch_counterH,
+    time_second,
+    time_minute,
+    time_hour,                                                                                                                                                                                                     
+    time_day,
+    punch_goalL,
+    punch_goalH
+};
+
 typedef struct timerSaveFormat{
 	uint8_t day;
 	uint8_t hour;
@@ -26,24 +41,35 @@ typedef struct timerSaveFormat{
 }timerSaveFMT;
 
 enum {watch_pause=0, watch_start};
+typedef enum which_page{
+    page1 = 0,
+    page2,
+    page3,
+    page_reset
+}wh_page;
+
 class punchCounterWatch
 {
 private:
 	uint8_t count_sensitivity_pin;
 	uint8_t battery_detect_pin;
 	int punchCounter;
+    int punch_goal;
 	unsigned long timeCounter;
 	void arrangeTimerDataForSave(unsigned long timeCounter);
 	unsigned long arrangeTimerDataForRead();
 	timerSaveFMT TMSF;
 	int getSensitivity();
 	bool start_pause_status;
-	int  save_sensitivity;
+    uint8_t page_counter;
+    bool change_page;
 public:
 	punchCounterWatch();
 	~punchCounterWatch();
 	int getPunchCountFromEEPROM();
+	int getPunchGoalFromEEPROM();
 	void savePunchCountToEEPROM();
+	void savePunchGoalToEEPROM(int val);
 	void punchCounterWatch_initial_set(uint8_t senstivityPin, uint8_t batteryDetectPin);
 	void saveTimerDataToEEPROM();
 	unsigned long getTimerDataFromEEPROM();
@@ -58,6 +84,12 @@ public:
 	bool get_start_pause_status();
 	uint8_t get_battery_percent(); 
 	uint8_t get_sensitivity_percent();
+    void add_page();
+    void set_which_page(wh_page pp);
+    wh_page get_page_count();
+    bool change_page_check();
+    int get_punchCounter();
+    int get_punchGoal();
 };
 
 #endif

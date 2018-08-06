@@ -18,12 +18,12 @@
 #define picture8x16 0
 #define picture128x64 0
 
-typedef struct punchCountOLED{
+typedef struct punch_digit{
 	uint8_t THD;	//thousand
 	uint8_t HUD;	//hundred
 	uint8_t TEN;	
 	uint8_t ONE;	
-}punch_count_OLED;
+}punch_count_digit;
 
 typedef struct timeSaveOLED{
 	uint8_t day_h;
@@ -35,6 +35,8 @@ typedef struct timeSaveOLED{
 	uint8_t second_h;
 	uint8_t second_l;
 }time_save_OLED;
+
+
 
 class punchOLED:protected OLED_SSD1306
 {
@@ -58,8 +60,9 @@ class punchOLED:protected OLED_SSD1306
 	void punchOLED_initial();	
 	void showPicture128x64_lab();
 	void showPicture128x64_fist();
-	void show_watch_page1(punch_count_OLED *PCOLED, time_save_OLED *TSOLED);
-	void show_watch_page2(bool charge, bool left_right,bool mode, punch_count_OLED *sensitivity);
+	void show_watch_page1(punch_count_digit *pcd, time_save_OLED *tso);
+	void show_watch_page2(punch_count_digit *power, bool left_right,bool mode, punch_count_digit *sensitivity);
+	void show_watch_page3(punch_count_digit *goal, punch_count_digit *pcd);
 	void clear_screen();
 	void show_watch_reset();
 };

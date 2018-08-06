@@ -16,6 +16,7 @@ punchBT_slave::punchBT_slave(void) {
 	is_reset = reset_no;
 	Serial.begin(9600);
 	BT.begin(BT_baudrate);
+    goal_value = 0;
 }
 
 
@@ -152,5 +153,97 @@ int punchBT_slave::get_transmitData() {
 
 void punchBT_slave::set_punch_pause(ch_punch_pause val) {
 		punch_pause = val;
+}
+
+dw_status punchBT_slave::Slave_mode_receive_goal_or_reset() {
+  if (BT.available()) {
+      val = BT.read();
+        if(val == dir && receiveSeq == 0) {
+            receiveSeq = 1;
+            dw_r_g = dw_reset;
+        } else if (val == 'g' && receiveSeq ==0) {
+            receiveSeq = 1;
+            dw_r_g = dw_goal;
+        }
+        
+        if(dw_r_g == dw_reset) {
+            return  deal_with_reset_event(val);
+        } else {
+            return  deal_with_goal_event(val);
+        }
+ 
+    }
+ return nothing;
+}
+
+dw_status punchBT_slave::deal_with_reset_event(char val) {
+
+        if (val == 'R' && receiveSeq == 1){
+          receiveSeq = 2;
+        } else if (val == 'S' && receiveSeq == 2){
+          receiveSeq = 3;
+        } else if (val == 'E' && receiveSeq == 3){
+          receiveSeq = 4;
+        } else if (val == 'T' && receiveSeq == 4){
+          receiveSeq = 5;
+        } else if (val == '.' && receiveSeq == 5){
+          receiveSeq = 6;
+        }
+
+		if (receiveSeq < 6) {
+			return donot_reset;
+		} else if (receiveSeq == 6) {
+			receiveSeq = 0;
+			transmitData = 0;
+			return do_reset;
+		}
+}
+
+dw_status punchBT_slave::deal_with_goal_event(char val) {
+        int temp;
+        if (val == 'g') {
+            return nothing;
+        } 
+        temp = val - '0';   //char convert to int
+        //Serial.print(F("val:"));
+        //Serial.println(val);
+        //Serial.print(F("temp:"));
+        //Serial.println(temp);
+
+
+        if(receiveSeq == 1){
+            goal_value = temp *1000; 
+           // Serial.print(F("seq1:"));
+            //Serial.println(goal_value);
+            receiveSeq = 2;
+        } else if (receiveSeq == 2){
+            goal_value = goal_value + temp *100; 
+            //Serial.print(F("seq2:"));
+            //Serial.println(goal_value);
+            receiveSeq = 3;
+        } else if (receiveSeq == 3){
+            goal_value = goal_value + temp *10; 
+            //Serial.print(F("seq3:"));
+            //Serial.println(goal_value);
+            receiveSeq = 4;
+        } else if (receiveSeq == 4){
+            goal_value = goal_value + temp; 
+            //Serial.print(F("seq4:"));
+            //Serial.println(goal_value);
+            receiveSeq = 5;
+        } else if (val == '.' && receiveSeq == 5){
+            receiveSeq = 0;
+            return get_goal;
+        }
+        
+    if(receiveSeq < 5){
+        return nothing;
+    } 
+
+}
+	
+
+int punchBT_slave::get_goal_value() {
+    return goal_value;
 }
 

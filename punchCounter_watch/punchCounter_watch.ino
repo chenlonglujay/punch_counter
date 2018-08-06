@@ -1,92 +1,11 @@
-#include <punchCounterWatch.h>
-#include <Thread.h>
-#include <Timer.h>
-#include <ThreadController.h>
-#include <punchBT_slave.h>
-#include <punchOLED.h>
-#include "OLED_database_watch.c"
-
-enum watch_left_right{wLeft = 0, wRight} ;
-#define module_LR wLeft      //if this module is right module, please change this parameter become wRight
-#if module_LR
-  #define punch_RL punch_R                
-  #define left_right right              
-#else if  
-  #define punch_RL punch_L                
-  #define left_right left               
-#endif
-#define show_time_serialMointor 0
-
-punchBT_slave punch_RL;
-punchCounterWatch PH_watch;
-Timer tp;
-punchOLED punch_OLED;
-
-// ThreadController that will controll all threads
-ThreadController controll = ThreadController();
-//Thread BT receiver 
-Thread* Thread_BT_receive = new Thread();
-//Thread BT transmit
-Thread* Thread_BT_transmit = new Thread();
-//Thread I2C OLED
-Thread* Thread_OLED = new Thread();
-
-#define TimerSmallestUnit 100
-#define start_pause_btn_pin 2      
-#define reset_page_btn_pin 3      //reset need press button 3 seconds
-
-#define AT_Mode 0       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
-#define slave_Mode 1   //second, use slave_Mode to recrive data from master or transmit data to master
-
-#define sensitivity_pin A0
-//#define start_pause_LED_pin 4       //start led ON, pause led OFF 
-#define battery_detect_pin  A1
-#define reset_check_arrive 30             //timer, TimerSmallestUnit  * reset_check_arrive
-#define second_check_arrive 10        //timer, TimerSmallestUnit  * second_check_arrive
-#define battery_check_arrive 300         //timer,  TimerSmallestUnit * battery_check_arrive
-#define tenMin_check_arrive  600      //600s = 10 mintues
-
-//change switch  status  of  start/pause button
-bool switchCheck_sp = true;
-
-//first time to press reset/page button
-bool reset_page_is_start = false;    
-
- //check system is or not executed all reset function
-bool resetAllDone = false;
-
-//timer count for some event check
-int timer_count = 0;
-int timer_reset_page_count = 0;         //count press button 3 seconds
-
-//when power on avoids system go into reset_page_ISR() function
-bool start_power_on = true;
-
-//save punch count now and before
-int punchCountBF = 0;
-int punchCountNow = 0;
-
- //pause mode only save date to eeprom once
-bool update_once = false;        
-
-//check battery
-int battery_count = 0;
-int battery_percent = 0;
-
-//check player is no used watch in 10 minutes,if no used,watch will change mode become pause mode automatically  
-bool autoPause = false;
-unsigned int timer_count_10Min = 0;
-
-enum OLED_show_page{sPage1=0 , sPage2, sPage_reset} ;
-uint8_t OLED_SP= sPage1 ; //show page default sets page1
-int test_punch_count = 99;
+#include "watch_set.h"
 
 void setup() {
   Serial.begin(9600);  
-  punchCounter_initial();
+  //punchCounter_initial();
 #if slave_Mode   
   PH_watch.punchCounterWatch_initial_set(sensitivity_pin, battery_detect_pin);
-  //pinMode(start_pause_LED_pin, OUTPUT);
+  punchCounter_initial();
   tp.every(TimerSmallestUnit,timerEvent);    
   interrupt_initial();
   thread_initial();
@@ -109,86 +28,66 @@ void timerEvent() {
                 if(timer_count == second_check_arrive) {
                       //TimerSmallestUnit *second_check_arrive = 1 second
                       PH_watch.timer_add_1_second();
-                      update_punch_timer();                 
-                      timer_count_10Min++;     
-                      test_punch_count = test_punch_count+1 ;
-                      if(test_punch_count == 9999) {
-                        test_punch_count = 0;
-                      }
+                      update_punch_timer();            
+ #if  auto_pause_switch                        
+                      timer_count_10Min++;                                           
                       if((timer_count_10Min >= tenMin_check_arrive) && autoPause) {
                            transmit_pause(&punch_RL);         //change mode become to pause mode
                            clear_auto_pasue();
                       }
+ #endif
                 }              
           } else {    
               if(update_once) { 
-                update_punch_timer();     //pause mode only save date to eeprom once
+                update_punch_timer();     //pause mode only save punch counter and time data to eeprom once
               }
               update_once = false;
           }         
-          arrange_reset_page();          
-          check_battery_percent();
+          arrange_reset_page();                
 }
 
-void check_battery_percent() {
-      battery_count++;
-      if(battery_count == battery_check_arrive ){ 
-          //TimerSmallestUnit *battery_check_arrive = 30 seconds                    
-          battery_percent = PH_watch.get_battery_percent();
-          Serial.print(" battery_percent: ");     
-          Serial.println(battery_percent);     
-          battery_count = 0;
-      }
-}
 
 void update_punch_timer() {         
          PH_watch.savePunchCountToEEPROM();
          PH_watch.saveTimerDataToEEPROM();
- 
 #if show_time_serialMointor
          showTimeData();      
 #endif
           timer_count = 0;  
 }
 
-void arrange_reset_page() {
-          if(reset_page_is_start) {
+void arrange_reset_page() {  
+          wh_page pp = PH_watch.get_page_count();
+          now_page = pp;
+          if(now_page == before_page && digitalRead(reset_page_btn_pin) == 0) {
+            //still press button
                   timer_reset_page_count++;              
                     if(timer_reset_page_count >= reset_check_arrive) {                        
                           //TimerSmallestUnit *reset_check_arrive = 3 seconds
-                            reset_data_count();
+                            reset_data_count();     //reset
                     } 
-              } else if (!reset_page_is_start && timer_reset_page_count != 0) {
-                    if(!resetAllDone) {
-                      //after resetAll finished ,avoids into changing page                      
-                        //Serial.println("changing page");       
-                         //punchCountNow++;         //ivan test        
-                         punch_OLED.clear_screen();   
-                         OLED_SP = !OLED_SP;               
-                         timer_reset_page_count = 0;          
-                    }
-                    resetAllDone = false;
-                    timer_reset_page_count = 0;
-              }
+          } else if(now_page == before_page && digitalRead(reset_page_btn_pin) ==1) {
+               timer_reset_page_count = 0;            
+          }
+          before_page = now_page;      
 }
 
 void reset_data_count() {
           PH_watch.resetAll();
-           Serial.println("resetAll");
-           timer_reset_page_count = 0;
-           resetAllDone = true;                                                          
+           //Serial.println("resetAll");
+           timer_reset_page_count = 0;                                                    
            reset_data(&punch_RL);                        //transmit count=0
            transmit_data(&punch_RL, 0, false);          
            transmit_pause(&punch_RL);               //change mode become to pause mode
            update_once = true;
-           OLED_SP = sPage_reset; 
-           test_punch_count = 0;
+           PH_watch.set_which_page(page_reset);
+           punchCountNow = 0;
 }
 
 void interrupt_initial() {
           digitalWrite(reset_page_btn_pin, HIGH); //turn on pullup resistors
           digitalWrite(start_pause_btn_pin, HIGH);  //turn on pullup resistors
-          attachInterrupt(digitalPinToInterrupt(reset_page_btn_pin), reset_page_ISR, CHANGE);
+          attachInterrupt(digitalPinToInterrupt(reset_page_btn_pin), reset_page_ISR, FALLING);   
           attachInterrupt(digitalPinToInterrupt(start_pause_btn_pin), start_pause_ISR, FALLING);          
 }
 
@@ -196,8 +95,8 @@ void reset_page_ISR() {
          if(!start_power_on) {
               static unsigned long last_interrupt_time = 0;
               unsigned long interrupt_time = millis();     
-              if (interrupt_time - last_interrupt_time > 50) {           
-                  reset_page_is_start = !reset_page_is_start;                                       
+              if (interrupt_time - last_interrupt_time > 200) {                 
+                   PH_watch.add_page();                              
               }
               last_interrupt_time = interrupt_time;
          }
@@ -209,13 +108,11 @@ void start_pause_ISR() {
             unsigned long interrupt_time = millis();
             if(interrupt_time - last_interrupt_time > 200) {                  
                 if(switchCheck_sp == watch_start) {
-                    //Serial.println("start");
-                    //digitalWrite(start_pause_LED_pin, LOW);     //LED ON
+                    //Serial.println("start");            
                     PH_watch.set_start();
                     switchCheck_sp = watch_pause;       //next push start/pause button down will go into pause
                 } else if(switchCheck_sp == watch_pause)  {
-                   //Serial.println("pause");
-                   //digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
+                   //Serial.println("pause");     
                    transmit_pause(&punch_RL);         //change mode become to pause mode
                    update_once = true;
                 }
@@ -244,9 +141,10 @@ void punchCounter_initial() {
         punch_RL.punchBT_slave_initial_set(AT_mode, left_right);         
           Serial.println("AT_mode");
 #else slave_Mode  
-        punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);       
-        battery_percent = PH_watch.get_battery_percent();
-        //digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
+        punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);      
+        punchCountNow  = PH_watch.get_punchCounter();     
+        punchGoal = PH_watch.get_punchGoal();  
+        //Serial.println(punchCountNow);  
 #endif  
 }
 
@@ -274,29 +172,38 @@ void BT_transmit() {
 }
 
 void BT_receive() {
-  bool receive_status;
-  receive_status = punch_RL.Slave_mode_receive_reset();
-  if(receive_status == reset_yes){
-    reset_data_count();
-  }
+  dw_status dws;
+  dws = punch_RL.Slave_mode_receive_goal_or_reset();
+  switch (dws) {
+    case do_reset:
+        reset_data_count();
+   break;                  
+   case donot_reset:
+   break;
+   case get_goal:
+        punchGoal = punch_RL.get_goal_value();    //from BT receives data of goal
+        PH_watch.savePunchGoalToEEPROM(punchGoal);     
+        //Serial.println(F("------------------------savePunchGoalToEEPROMl-----------------"));
+        //Serial.println(punchGoal);
+    break;                                                                                                                                                                                                                      
+   case  nothing: 
+    break;
+  }  
 }
 
 void get_count_transmitData(punchBT_slave *input) {
   bool show_data = false;
- int sensitivity;
+          
   if(PH_watch.get_start_pause_status()){       
         punchCountNow  = PH_watch.getHumanPunchCount(); 
-        punchCountNow = test_punch_count;    
          //Serial.print("punchCount: ");
-         //Serial.println(punchCountNow);
-          sensitivity = PH_watch.get_sensitivity_percent();
-         //Serial.print("sensitivity: ");
-         //Serial.println(sensitivity);
-         
+         //Serial.println(punchCountNow);   
         if(punchCountNow > punchCountBF) {
             clear_auto_pasue();
         } else if (punchCountNow == punchCountBF)  {
+ #if  auto_pause_switch             
             autoPause = true;
+ #endif
         }
                 
         if(input->get_transmitData() == 9999) { 
@@ -310,57 +217,112 @@ void get_count_transmitData(punchBT_slave *input) {
 }
 
 void OLED_display() {
-  //int punch_count = punchCountNow;
-  int punch_count = test_punch_count;
-  punch_count_OLED *pco = new punch_count_OLED;
-  time_save_OLED *tso = new time_save_OLED;
+  punch_count_digit *pcd = new punch_count_digit;
+  punch_count_digit *power = new punch_count_digit;
+  punch_count_digit *goal = new punch_count_digit;
+  punch_count_digit *goal_sub_now = new punch_count_digit;
+  punch_count_digit *sensitivity = new punch_count_digit;
+  time_save_OLED *tso = new time_save_OLED;  
   timerSaveFMT *TS = new timerSaveFMT;
-  *TS = PH_watch.getTimeData();
-   tso->day_h = TS->day / 10;
-   tso->day_l = TS->day % 10;
-   tso->hour_h = TS->hour / 10;
-   tso->hour_l = TS->hour % 10;
-   tso->minute_h = TS->minute / 10;
-   tso->minute_l =  TS->minute % 10;
-   tso->second_h = TS->second / 10;
-   tso->second_l = TS->second % 10;
-               
-  pco->THD =  punch_count / 1000;  
- //Serial.print(pco->THD);
- punch_count =punch_count % 1000;
- 
-  pco->HUD = punch_count / 100;
-  //Serial.print(pco->HUD);
-  punch_count =punch_count % 100;
-  
-  pco->TEN =  punch_count / 10;
-  //Serial.print( pco->TEN);
- punch_count =punch_count % 10;
-   
-  pco->ONE = punch_count % 10;;
- //Serial.println( pco->ONE);
- 
-  if(OLED_SP == sPage1) {
-      punch_OLED.show_watch_page1(pco, tso);  
-  } else if (OLED_SP == sPage2) {
-      pco->HUD = 0;
-      pco->TEN = 3;
-      pco->ONE = 0;
-      punch_OLED.show_watch_page2(1,  module_LR, !switchCheck_sp, pco);     
-      //1 bool not0/charge1,
-      //2 bool left0/right1 watch, 
-      //3 bool pause0/start1 mode, 
-      //4 punch count sensitivity(0~100%)
-  } else {
-      punch_OLED.clear_screen();
-      punch_OLED.show_watch_reset();
-      delay(1000);
-      punch_OLED.clear_screen();
-      OLED_SP = sPage1;      
+
+  //if change page need to clear OLED display
+  if(PH_watch.change_page_check()){
+    punch_OLED.clear_screen();
+  } else {  
+        if(PH_watch.get_page_count() == page1) {
+            time_div_cul(tso, TS);
+            pcd_div_cul(pcd);   
+            punch_OLED.show_watch_page1(pcd, tso);  
+        }else if(PH_watch.get_page_count() == page2) {          
+            power_div_cul(power);
+            sensitivity_div_cul(sensitivity);
+            punch_OLED.show_watch_page2(power,  module_LR, !switchCheck_sp, sensitivity);     
+            //1 power(0~100%)
+            //2 bool left0/right1 watch, 
+            //3 bool pause0/start1 mode, 
+            //4 punch count sensitivity(0~100%)     
+        } else if (PH_watch.get_page_count() == page3) {
+            goal_countdown_div_cul(goal, goal_sub_now );
+            pcd_div_cul(pcd);   
+          punch_OLED.show_watch_page3(goal, goal_sub_now );   
+        } else {
+          //reset page
+            punch_OLED.clear_screen();
+            punch_OLED.show_watch_reset();
+            delay(1000);
+            punch_OLED.clear_screen();
+            PH_watch.set_which_page(page1);
+        }
   }
-  delete pco;
+  delete sensitivity;
+  delete power;
+  delete goal_sub_now ;
+  delete goal;
+  delete pcd;
   delete tso;
   delete TS;
+}
+
+void time_div_cul(time_save_OLED *time_show_val, timerSaveFMT *time_input) {
+   *time_input= PH_watch.getTimeData();   
+   time_show_val->day_h = time_input->day / 10;
+   time_show_val->day_l = time_input->day % 10;
+   time_show_val->hour_h = time_input->hour / 10;
+   time_show_val->hour_l = time_input->hour % 10;
+   time_show_val->minute_h = time_input->minute / 10;
+   time_show_val->minute_l =  time_input->minute % 10;
+   time_show_val->second_h = time_input->second / 10;
+   time_show_val->second_l = time_input->second % 10;
+}
+
+void power_div_cul(punch_count_digit *bp) {
+  uint8_t power_battery =  PH_watch.get_battery_percent();
+  //power_battery = 30; //test
+   bp->THD = 0;
+   bp->HUD = power_battery  /100;
+   power_battery  = power_battery  % 100;
+   bp->TEN =  power_battery   /10;
+   bp->ONE = power_battery  % 10;     
+}
+
+void goal_countdown_div_cul(punch_count_digit * goal ,punch_count_digit  *goal_sub_now ) {
+    //int goal_test = 1897;
+    int goal_temp = punchGoal;
+   //int now_test = 97;
+    int goal_sub_now_temp = goal_temp - punchCountNow ;
+    goal->THD = goal_temp /1000;
+    goal_temp = goal_temp % 1000;
+    goal->HUD = goal_temp / 100;
+    goal_temp = goal_temp % 100;
+    goal->TEN = goal_temp / 10;
+    goal->ONE = goal_temp % 10; 
+    
+    goal_sub_now->THD = goal_sub_now_temp /1000;
+    goal_sub_now_temp = goal_sub_now_temp % 1000;
+    goal_sub_now->HUD = goal_sub_now_temp / 100;
+    goal_sub_now_temp = goal_sub_now_temp  % 100;
+    goal_sub_now->TEN = goal_sub_now_temp  / 10;
+    goal_sub_now->ONE = goal_sub_now_temp  % 10; 
+
+}
+
+void pcd_div_cul(punch_count_digit  *pcd_val) { 
+  int pouch_count_temp = punchCountNow; 
+  pcd_val->THD =  pouch_count_temp / 1000;  
+  pouch_count_temp = pouch_count_temp % 1000; 
+  pcd_val->HUD = pouch_count_temp / 100;
+  pouch_count_temp = pouch_count_temp% 100;  
+  pcd_val->TEN =  pouch_count_temp/ 10;
+  pcd_val->ONE = pouch_count_temp % 10;   
+}
+
+void  sensitivity_div_cul(punch_count_digit  *sen){
+   uint8_t sen_temp = PH_watch.get_sensitivity_percent();  
+   sen->THD = 0;
+   sen->HUD = sen_temp / 100;
+   sen_temp = sen_temp %100;
+   sen->TEN = sen_temp /10;
+   sen->ONE = sen_temp %10;  
 }
 
 void reset_data(punchBT_slave *input) {
@@ -378,7 +340,6 @@ void transmit_pause(punchBT_slave *input) {
      PH_watch.set_pause();                      //work likes pause mode     
      input->set_punch_pause(pause);
      input->Slave_mode_transmit(false);          
-     //digitalWrite(start_pause_LED_pin, HIGH);       //LED OFF
      switchCheck_sp = watch_start;       //next push start/pause button down will go into start  
 }
 
@@ -392,9 +353,9 @@ void  OLED_initial() {
   delay(10);
   punch_OLED.clear_screen();
   punch_OLED.showPicture128x64_lab();
-  delay(2000);  
+  delay(1500);  
   punch_OLED.clear_screen();
   punch_OLED.showPicture128x64_fist();
-  delay(2000);  
+  delay(1500);  
   punch_OLED.clear_screen();  
 }

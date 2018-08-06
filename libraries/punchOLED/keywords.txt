@@ -22,6 +22,7 @@ showCN	   		KEYWORD2
 punchOLED_initial	KEYWORD2
 show_watch_page1  	KEYWORD2
 show_watch_page2  	KEYWORD2
+show_watch_page3  	KEYWORD2
 clear_screen  		KEYWORD2
 show_watch_reset  	KEYWORD2
 

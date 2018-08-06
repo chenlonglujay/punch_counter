@@ -16,7 +16,7 @@ punchCounterWatch::punchCounterWatch(void) {
 	TMSF.minute = 0;
 	TMSF.hour = 0;
 	TMSF.day = 0;
-	save_sensitivity = 0;
+    page_counter = 0;
 }
 
 punchCounterWatch::~punchCounterWatch(void) {
@@ -29,38 +29,67 @@ void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin
 	pinMode(sensitivityPin, INPUT);
 	pinMode(batteryDetectPin, INPUT);
 	punchCounter = getPunchCountFromEEPROM();
-	timeCounter = getTimerDataFromEEPROM();
+	//Serial.println(F("punchCounter initial:"));
+	//Serial.println(punchCounter);
+    timeCounter = getTimerDataFromEEPROM();
 	punch_count.PunchCounter_initial(SDO_1, s8g, punchCounter);
-	set_pause();
+    punch_goal = getPunchGoalFromEEPROM();
+	//Serial.println(F("punch_goal initial:"));
+	//Serial.println(punch_goal);
+    set_pause();
 }
 
 int punchCounterWatch::getPunchCountFromEEPROM() {
-	byte tempL = EEPROM.read(0);
-	byte tempH = EEPROM.read(1);
+	byte tempL = EEPROM.read(punch_counterL);
+	byte tempH = EEPROM.read(punch_counterH);
 	int getCount = (tempH << 8) + tempL;
 	return getCount;
 }
 
+int punchCounterWatch::getPunchGoalFromEEPROM() {
+	byte tempL = EEPROM.read(punch_goalL);
+	byte tempH = EEPROM.read(punch_goalH);
+	int getGoal = (tempH << 8) + tempL;
+	//Serial.println(F("get punch_goal from eeprom:"));
+	//Serial.println(getGoal);
+	return getGoal;
+}
+
+
 void punchCounterWatch::savePunchCountToEEPROM() {
 		int temp;
 		uint8_t tempH,tempL;
-		if(punchCounter > 9999) {
-			temp = 9999;
+		if(punchCounter > counter_max) {
+			temp = counter_max;
 		} else {
 			temp = punchCounter;
 		}		
 		tempL = temp & 0x00ff;
-		EEPROM.write(0,tempL);
+		EEPROM.write(punch_counterL,tempL);
 		tempH = temp >> 8;
-		EEPROM.write(1,tempH);
+		EEPROM.write(punch_counterH,tempH);
+}
+
+void punchCounterWatch::savePunchGoalToEEPROM(int val) {
+		int temp = val;
+		uint8_t tempH,tempL;
+        Serial.print("save goal to eeprom:");
+        Serial.println(temp);
+		if(temp > punch_goal_default) {
+			temp = counter_max;
+        }
+		tempL = temp & 0x00ff;
+		EEPROM.write(punch_goalL,tempL);
+		tempH = temp >> 8;
+		EEPROM.write(punch_goalH,tempH);
 }
 
 void punchCounterWatch::saveTimerDataToEEPROM() {
 	arrangeTimerDataForSave(timeCounter);
-	EEPROM.write(2,TMSF.second);
-	EEPROM.write(3,TMSF.minute);
-	EEPROM.write(4,TMSF.hour);
-	EEPROM.write(5,TMSF.day);
+	EEPROM.write(time_second,TMSF.second);
+	EEPROM.write(time_minute,TMSF.minute);
+	EEPROM.write(time_hour,TMSF.hour);
+	EEPROM.write(time_day,TMSF.day);
 }
 
 void punchCounterWatch::arrangeTimerDataForSave(unsigned long timeCounter) {
@@ -100,10 +129,10 @@ void punchCounterWatch::arrangeTimerDataForSave(unsigned long timeCounter) {
 }
 
 unsigned long punchCounterWatch::getTimerDataFromEEPROM() {
-	TMSF.second = EEPROM.read(2);
-	TMSF.minute = EEPROM.read(3);
-	TMSF.hour = EEPROM.read(4);
-	TMSF.day = EEPROM.read(5);
+	TMSF.second = EEPROM.read(time_second);
+	TMSF.minute = EEPROM.read(time_minute);
+	TMSF.hour = EEPROM.read(time_hour);
+	TMSF.day = EEPROM.read(time_day);
 	/*		
 	Serial.println("get dd:hh:mm:ss");
 	Serial.print(TMSF.day);
@@ -131,7 +160,6 @@ unsigned long punchCounterWatch::arrangeTimerDataForRead() {
 
 int punchCounterWatch::getSensitivity() {
 	int val = analogRead(count_sensitivity_pin);	//0-1023
-	save_sensitivity = val;
 	//Serial.print("sensitivity: ");
 	//Serial.println(val);
 	return val;
@@ -189,9 +217,76 @@ uint8_t punchCounterWatch::get_battery_percent() {
 }
 
 uint8_t punchCounterWatch::get_sensitivity_percent() {
-	int val = save_sensitivity;
+	int val = getSensitivity();
 	float detect = (float)val / 1023.00;
 	detect  = detect * 100;
 	val = (int)detect;
 	return val;
+}
+
+void punchCounterWatch::add_page() {
+    page_counter++;
+    if (page_counter >= page_counter_max) {
+        page_counter = 0;
+    }
+    change_page = 1;
+}
+
+void punchCounterWatch::set_which_page(wh_page pp) {
+    switch (pp){
+    case 0:
+        page_counter = 0;
+    break;
+    case 1:
+        page_counter = 1;
+    break;
+    case 2:
+        page_counter = 2;
+    break;
+    case 3:
+        page_counter = 3;
+    break;
+    default:
+        page_counter = 0;
+    break;
+    }
+} 
+
+wh_page punchCounterWatch::get_page_count() {
+    wh_page pp; 
+    switch (page_counter){
+    case 0:
+        pp = page1;
+    break;
+    case 1:
+        pp = page2;
+    break;
+    case 2:
+        pp = page3;
+    break;
+    case 3:
+        pp = page_reset;
+    break;
+    default:
+        pp = page1;
+    break;
+    }
+    return pp;
+}
+
+bool punchCounterWatch::change_page_check() {
+    if(change_page){
+       change_page = 0; 
+       return  1;
+    } else {
+        return 0;
+    }
+}
+
+int punchCounterWatch::get_punchCounter() {
+    return punchCounter;
+}
+
+int punchCounterWatch::get_punchGoal() {
+    return punch_goal;
 }

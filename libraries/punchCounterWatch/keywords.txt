@@ -27,6 +27,13 @@ set_pause			KEYWORD2
 get_start_pause_status	   	KEYWORD2
 get_battery_percent		KEYWORD2
 get_sensitivity_percent		KEYWORD2	
+add_page			KEYWORD2                                                    
+set_which_page			KEYWORD2
+get_page_count   		KEYWORD2
+change_page_check   		KEYWORD2	
+get_punchCounter     		KEYWORD2
+get_punchGoal			KEYWORD2
+
 #######################################
 # Instances (KEYWORD2)
 #######################################

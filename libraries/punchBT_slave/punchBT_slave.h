@@ -19,6 +19,10 @@
 //	data format:
 //	left arm: slave transmits "lPUSE." to master ,expresses slave is pause
 //	right arm: slave transmits "rPUSE." to master ,expresses slave is pause
+//5.slave receives goal value from master
+//  data format:
+//  left and right arm: slave receives "gxxxx." ex:"g0887." that expresses punch goal is 887
+
 //!!use BT module need to pair echo other!!
 //First,you need use AT_mode to pair BT module echo other,please refer to BT_pair document
 //when you pair BT module succeed each other(master and slave),that can receive or transmit data
@@ -65,6 +69,14 @@ typedef enum chooseDir {left='l', right='r'} ch_dir;
 typedef enum chooseMode {AT_mode=0, Slave_mode} ch_mode;
 typedef enum choosePunch_Pause {punch=0, pause} ch_punch_pause;
 typedef enum resetStatus {reset_no=0, reset_yes} reset_status;
+typedef enum deal_with_reset_goal{dw_reset=0, dw_goal}dw_R_G;
+typedef enum deal_with_status
+{do_reset=0,
+ donot_reset,
+ get_goal,
+ nothing 
+}dw_status;
+
 #define BT_baudrate 38400
 
 class punchBT_slave
@@ -79,6 +91,10 @@ private:
 	int transmitData;
 	bool punch_pause;
 	void arrangeData(char *transmit_data_buf, bool show_data);
+    int goal_value;
+    dw_status deal_with_reset_event(char val);
+    dw_status deal_with_goal_event(char val);
+    dw_R_G dw_r_g; 
 public:
 	punchBT_slave();
 	~punchBT_slave();
@@ -90,7 +106,9 @@ public:
 	void set_punch_pause(ch_punch_pause val);
 	void AT_mode_function();
 	bool Slave_mode_receive_reset();
-	void Slave_mode_transmit(bool show_data);
+    dw_status Slave_mode_receive_goal_or_reset();
+    void Slave_mode_transmit(bool show_data);
+    int get_goal_value();
 };
 
 #endif
