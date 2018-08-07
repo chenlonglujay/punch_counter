@@ -64,7 +64,8 @@ void arrange_reset_page() {
                   timer_reset_page_count++;              
                     if(timer_reset_page_count >= reset_check_arrive) {                        
                           //TimerSmallestUnit *reset_check_arrive = 3 seconds
-                            reset_data_count();     //reset
+                            //reset_data_count();     //reset
+                            PH_watch.set_which_page(page_reset);
                     } 
           } else if(now_page == before_page && digitalRead(reset_page_btn_pin) ==1) {
                timer_reset_page_count = 0;            
@@ -73,14 +74,15 @@ void arrange_reset_page() {
 }
 
 void reset_data_count() {
-          PH_watch.resetAll();
-           //Serial.println("resetAll");
+         //Serial.println("resetAll");
+          PH_watch.resetAll();       
            timer_reset_page_count = 0;                                                    
            reset_data(&punch_RL);                        //transmit count=0
            transmit_data(&punch_RL, 0, false);          
            transmit_pause(&punch_RL);               //change mode become to pause mode
+           punchGoal = punch_goal_default;
+           PH_watch.savePunchGoalToEEPROM(punchGoal);  
            update_once = true;
-           PH_watch.set_which_page(page_reset);
            punchCountNow = 0;
 }
 
@@ -244,9 +246,9 @@ void OLED_display() {
         } else if (PH_watch.get_page_count() == page3) {
             goal_countdown_div_cul(goal, goal_sub_now );
             pcd_div_cul(pcd);   
-          punch_OLED.show_watch_page3(goal, goal_sub_now );   
-        } else {
-          //reset page
+           punch_OLED.show_watch_page3(goal, goal_sub_now );   
+        } else  if (PH_watch.get_page_count() == page_reset ){
+            reset_data_count();
             punch_OLED.clear_screen();
             punch_OLED.show_watch_reset();
             delay(1000);
