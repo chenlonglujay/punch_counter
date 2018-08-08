@@ -36,7 +36,7 @@ typedef struct timeSaveOLED{
 	uint8_t second_l;
 }time_save_OLED;
 
-
+typedef enum goalClear{clear_N=0, clear_Y}goal_clear;
 
 class punchOLED:protected OLED_SSD1306
 {
@@ -54,6 +54,7 @@ class punchOLED:protected OLED_SSD1306
 #endif
 	void showPicture16x16(unsigned char x, unsigned char y, unsigned char N);
 	void showCN(unsigned char x, unsigned char y, unsigned char N);
+    goal_clear GC;
  public:
   punchOLED();
   ~punchOLED();

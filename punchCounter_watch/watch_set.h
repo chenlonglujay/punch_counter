@@ -78,4 +78,5 @@ unsigned int timer_count_10Min = 0;
 
 uint8_t before_page;
 uint8_t now_page;
+
 #endif

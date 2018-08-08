@@ -72,7 +72,6 @@ typedef enum resetStatus {reset_no=0, reset_yes} reset_status;
 typedef enum deal_with_reset_goal{dw_reset=0, dw_goal}dw_R_G;
 typedef enum deal_with_status
 {do_reset=0,
- donot_reset,
  get_goal,
  nothing 
 }dw_status;
@@ -94,7 +93,7 @@ private:
     int goal_value;
     dw_status deal_with_reset_event(char val);
     dw_status deal_with_goal_event(char val);
-    dw_R_G dw_r_g; 
+    dw_R_G dw_r_g;
 public:
 	punchBT_slave();
 	~punchBT_slave();

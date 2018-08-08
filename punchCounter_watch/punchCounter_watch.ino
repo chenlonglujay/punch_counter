@@ -2,7 +2,6 @@
 
 void setup() {
   Serial.begin(9600);  
-  //punchCounter_initial();
 #if slave_Mode   
   PH_watch.punchCounterWatch_initial_set(sensitivity_pin, battery_detect_pin);
   punchCounter_initial();
@@ -64,7 +63,6 @@ void arrange_reset_page() {
                   timer_reset_page_count++;              
                     if(timer_reset_page_count >= reset_check_arrive) {                        
                           //TimerSmallestUnit *reset_check_arrive = 3 seconds
-                            //reset_data_count();     //reset
                             PH_watch.set_which_page(page_reset);
                     } 
           } else if(now_page == before_page && digitalRead(reset_page_btn_pin) ==1) {
@@ -74,7 +72,7 @@ void arrange_reset_page() {
 }
 
 void reset_data_count() {
-         //Serial.println("resetAll");
+         Serial.println("resetAll");
           PH_watch.resetAll();       
            timer_reset_page_count = 0;                                                    
            reset_data(&punch_RL);                        //transmit count=0
@@ -83,6 +81,7 @@ void reset_data_count() {
            punchGoal = punch_goal_default;
            PH_watch.savePunchGoalToEEPROM(punchGoal);  
            update_once = true;
+           PH_watch.set_transmit_BT_reset(transmit_0_not);
            punchCountNow = 0;
 }
 
@@ -108,15 +107,17 @@ void reset_page_ISR() {
 void start_pause_ISR() {
             static unsigned long last_interrupt_time = 0;
             unsigned long interrupt_time = millis();
-            if(interrupt_time - last_interrupt_time > 200) {                  
-                if(switchCheck_sp == watch_start) {
-                    //Serial.println("start");            
-                    PH_watch.set_start();
-                    switchCheck_sp = watch_pause;       //next push start/pause button down will go into pause
-                } else if(switchCheck_sp == watch_pause)  {
-                   //Serial.println("pause");     
-                   transmit_pause(&punch_RL);         //change mode become to pause mode
-                   update_once = true;
+            if(interrupt_time - last_interrupt_time > 200) {           
+                if( PH_watch.check_goal_done(punchGoal , punchCountNow) == goal_not_yet) {       
+                          if(switchCheck_sp == watch_start) {
+                              //Serial.println("start");            
+                              PH_watch.set_start();
+                              switchCheck_sp = watch_pause;       //next push start/pause button down will go into pause
+                          } else if(switchCheck_sp == watch_pause)  {
+                             //Serial.println("pause");     
+                             transmit_pause(&punch_RL);         //change mode become to pause mode
+                             update_once = true;
+                          }
                 }
             }
             last_interrupt_time = interrupt_time;
@@ -178,17 +179,22 @@ void BT_receive() {
   dws = punch_RL.Slave_mode_receive_goal_or_reset();
   switch (dws) {
     case do_reset:
+        Serial.println(F("do_reset"));
+        PH_watch.set_which_page(page_reset);
         reset_data_count();
-   break;                  
-   case donot_reset:
-   break;
-   case get_goal:
+   break;   
+   case get_goal:   
+    //Serial.println(F("get goal"));
         punchGoal = punch_RL.get_goal_value();    //from BT receives data of goal
+        if(punchGoal == 0 || punchGoal >punch_goal_default ) {
+          punchGoal = punch_goal_default;
+        }
         PH_watch.savePunchGoalToEEPROM(punchGoal);     
         //Serial.println(F("------------------------savePunchGoalToEEPROMl-----------------"));
         //Serial.println(punchGoal);
     break;                                                                                                                                                                                                                      
    case  nothing: 
+   //Serial.println(F("nothing"));
     break;
   }  
 }
@@ -200,22 +206,30 @@ void get_count_transmitData(punchBT_slave *input) {
         punchCountNow  = PH_watch.getHumanPunchCount(); 
          //Serial.print("punchCount: ");
          //Serial.println(punchCountNow);   
+         
         if(punchCountNow > punchCountBF) {
+#if  auto_pause_switch                     
             clear_auto_pasue();
+#endif           
+            transmit_data(input, punchCountNow, show_data);
         } else if (punchCountNow == punchCountBF)  {
  #if  auto_pause_switch             
             autoPause = true;
  #endif
         }
-                
-        if(input->get_transmitData() == 9999) { 
-             reset_data(input);
-         }
-        transmit_data(input, punchCountNow, show_data);        
+        if( PH_watch.check_goal_done(punchGoal , punchCountNow) == goal_done){
+                transmit_pause(&punch_RL);         //change mode become to pause mode
+        }                    
         punchCountBF = punchCountNow;
-    } else {      
-      //Serial.println("puase");
-    }
+    } 
+    
+    //if reset,slave transmit l0000. or r0000.
+   if(PH_watch.get_page_count() == page_reset) {
+      if(PH_watch.get_transmit_BT_reset() == transmit_0_not) {
+          reset_data(input);
+          PH_watch.set_transmit_BT_reset(transmit_0_done);
+      }
+   }
 }
 
 void OLED_display() {

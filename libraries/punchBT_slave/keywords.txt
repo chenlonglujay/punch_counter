@@ -14,19 +14,22 @@ punch_pause		KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-punchBT_slave_initial_set 	KEYWORD2
+punchBT_slave_initial_set 		KEYWORD2
 void AT_mode_function 			KEYWORD2
 Slave_mode_receive_reset 		KEYWORD2
-Slave_mode_transmit					KEYWORD2
-transmitData_add						KEYWORD2
-transmitData_dec						KEYWORD2
-set_transmitData						KEYWORD2
-get_transmitData						KEYWORD2
-set_punch_pause							KEYWORD2
+Slave_mode_transmit			KEYWORD2
+transmitData_add			KEYWORD2
+transmitData_dec			KEYWORD2
+set_transmitData			KEYWORD2
+get_transmitData			KEYWORD2
+set_punch_pause				KEYWORD2
 get_goal_value				KEYWORD2
 Slave_mode_receive_goal_or_reset	KEYWORD2	
 deal_with_reset_event			KEYWORD2
 deal_with_goal_event			KEYWORD2
+check_goal_done				KEYWORD2
+set_transmit_BT_reset			KEYWORD2
+get_transmit_BT_reset			KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

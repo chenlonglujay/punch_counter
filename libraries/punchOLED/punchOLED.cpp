@@ -19,6 +19,7 @@ punchOLED::~punchOLED(){
 void punchOLED::punchOLED_initial(){
 	initial();	//inherit form OLED_SSD1306
 	fill_screen(0x00, 0x00);  //clear screen
+    GC = clear_N;
 }
 
 void punchOLED::showCN(unsigned char x, unsigned char y, unsigned char N){
@@ -200,24 +201,49 @@ void punchOLED::show_watch_page3(punch_count_digit *goal, punch_count_digit *pcd
 		showNUM(8 * x_pos8, crow*y_pos, goal->TEN);	
 		showNUM(10 * x_pos8, crow*y_pos, goal->ONE);	
 
-		//row 3 show punch count countdown (goal - now) title
-		crow = 2;
-		showCN(2 * x_pos16, crow* y_pos, 15);	
-		showCN(3 * x_pos16, crow*y_pos, 14);
-		showCN(4 * x_pos16, crow*y_pos, 3);
-		showCN(5 * x_pos16, crow*y_pos, 14);
-		showSSYM(6 * x_pos16, crow*y_pos, symbol_8x16_colon);	//:
+        if(pcd->THD == 0 && pcd->HUD == 0 && pcd->TEN == 0 && pcd->ONE == 0){
+            //row 3 show goal
+            crow = 2;
+            if(GC == clear_N) {
+                for(int i=2; i<14; i++)
+                    showSSYM(i * x_pos8, crow * y_pos,symbol_8x16_space);	
+            }
+		    showCN(3 * x_pos16, crow * y_pos, 12);	
+		    showCN(4 * x_pos16, crow * y_pos, 13);
 
-		//row 4 show goal -now
-		crow = 3;
-		showNUM(4 * x_pos8, crow*y_pos, pcd->THD);
-		showNUM(6 * x_pos8, crow*y_pos, pcd->HUD);
-		showNUM(8 * x_pos8, crow*y_pos, pcd->TEN);
-		showNUM(10 * x_pos8, crow*y_pos, pcd->ONE);
+            //row 4 show done
+            crow = 3;
+            if(GC == clear_N){
+		        showSSYM(4 * x_pos8, crow*y_pos, symbol_8x16_space);	// 
+		        showSSYM(6 * x_pos8, crow*y_pos, symbol_8x16_space);	// 
+		        showSSYM(8 * x_pos8, crow*y_pos, symbol_8x16_space);	// 
+		        showSSYM(10 * x_pos8, crow*y_pos, symbol_8x16_space);	// 
+            }
+            GC = clear_Y;
+		    showCN(3 * x_pos16, crow*y_pos, 21);
+		    showCN(4 * x_pos16, crow*y_pos, 22);
+
+        } else {
+            //row 3 show punch count countdown (goal - now) title
+		    crow = 2;
+		    showCN(2 * x_pos16, crow* y_pos, 15);	
+		    showCN(3 * x_pos16, crow*y_pos, 14);
+		    showCN(4 * x_pos16, crow*y_pos, 3);
+		    showCN(5 * x_pos16, crow*y_pos, 14);
+		    showSSYM(6 * x_pos16, crow*y_pos, symbol_8x16_colon);	//:
+
+		    //row 4 show goal -now
+		    crow = 3;
+		    showNUM(4 * x_pos8, crow*y_pos, pcd->THD);
+		    showNUM(6 * x_pos8, crow*y_pos, pcd->HUD);
+		    showNUM(8 * x_pos8, crow*y_pos, pcd->TEN);
+		    showNUM(10 * x_pos8, crow*y_pos, pcd->ONE);
+        }
 }
 
 void punchOLED::show_watch_reset(){
 		//show R S T epresses reset all data
+        GC = clear_N;
 		uint8_t x_pos8 = 8;
 		uint8_t y_pos = 2;
 		uint8_t crow = 2;

@@ -18,7 +18,7 @@
 #define PUNCHCOUNTERWATCH_h
 #include <ADXL345_PUNCH_COUNTER.h>
 #include <EEPROM.h>
-#define counter_max 9999
+#define counter_max 4999
 #define page_counter_max 3
 #define punch_goal_default 4999
 
@@ -48,6 +48,9 @@ typedef enum which_page{
     page_reset
 }wh_page;
 
+typedef enum check_goal_finish{goal_not_yet = 0, goal_done}goal_finish; 
+typedef enum check_transmit_0{transmit_0_not = 0, transmit_0_done}transmit_BT_reset;
+
 class punchCounterWatch
 {
 private:
@@ -63,6 +66,7 @@ private:
 	bool start_pause_status;
     uint8_t page_counter;
     bool change_page;
+    transmit_BT_reset TBR;
 public:
 	punchCounterWatch();
 	~punchCounterWatch();
@@ -90,6 +94,9 @@ public:
     bool change_page_check();
     int get_punchCounter();
     int get_punchGoal();
+    goal_finish check_goal_done(int goal, int punch_now);
+    void set_transmit_BT_reset(transmit_BT_reset val);
+    transmit_BT_reset get_transmit_BT_reset();
 };
 
 #endif

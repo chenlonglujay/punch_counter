@@ -73,10 +73,10 @@ void punchCounterWatch::savePunchCountToEEPROM() {
 void punchCounterWatch::savePunchGoalToEEPROM(int val) {
 		int temp = val;
 		uint8_t tempH,tempL;
-        Serial.print("save goal to eeprom:");
-        Serial.println(temp);
-		if(temp > punch_goal_default) {
-			temp = counter_max;
+        //Serial.print("save goal to eeprom:");
+        //Serial.println(temp);
+		if(temp > punch_goal_default || temp == 0) {
+			temp = punch_goal_default;
         }
 		tempL = temp & 0x00ff;
 		EEPROM.write(punch_goalL,tempL);
@@ -290,3 +290,21 @@ int punchCounterWatch::get_punchCounter() {
 int punchCounterWatch::get_punchGoal() {
     return punch_goal;
 }
+
+goal_finish punchCounterWatch::check_goal_done(int goal, int punch_now) {
+    if (punch_now == goal) {
+       return goal_done; 
+    } else {
+       return goal_not_yet; 
+    }
+}
+
+void punchCounterWatch::set_transmit_BT_reset(transmit_BT_reset val) {
+    TBR = val;
+}
+
+transmit_BT_reset punchCounterWatch::get_transmit_BT_reset() {
+    return TBR;
+}
+
+
