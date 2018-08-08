@@ -3,9 +3,12 @@
 void setup() {
   Serial.begin(9600);  
 #if slave_Mode   
+  timer_count = 0;
+  timer_reset_page_count = 0;
   PH_watch.punchCounterWatch_initial_set(sensitivity_pin, battery_detect_pin);
   punchCounter_initial();
-  tp.every(TimerSmallestUnit,timerEvent);    
+  tp.every(TimerSmallestUnit, timerEvent_start_pause);    
+  tc.every(TimerSmallestUnit, timerEvent_reset_page);  
   interrupt_initial();
   thread_initial();
   OLED_initial();
@@ -18,16 +21,20 @@ void loop() {
 #else if slave_Mode    
   controll.run();
   tp.update(); 
+  tc.update(); 
  #endif
 }
 
-void timerEvent() {          
+void timerEvent_start_pause() {          
           if(PH_watch.get_start_pause_status()) {
             timer_count++;        
                 if(timer_count == second_check_arrive) {
                       //TimerSmallestUnit *second_check_arrive = 1 second
                       PH_watch.timer_add_1_second();
-                      update_punch_timer();            
+                       timer_count = 0;  
+#if show_time_serialMointor
+         showTimeData();      
+#endif                             
  #if  auto_pause_switch                        
                       timer_count_10Min++;                                           
                       if((timer_count_10Min >= tenMin_check_arrive) && autoPause) {
@@ -36,23 +43,16 @@ void timerEvent() {
                       }
  #endif
                 }              
-          } else {    
-              if(update_once) { 
-                update_punch_timer();     //pause mode only save punch counter and time data to eeprom once
-              }
-              update_once = false;
-          }         
-          arrange_reset_page();                
+          }                  
 }
 
+void timerEvent_reset_page(){
+    arrange_reset_page();  
+}
 
 void update_punch_timer() {         
          PH_watch.savePunchCountToEEPROM();
-         PH_watch.saveTimerDataToEEPROM();
-#if show_time_serialMointor
-         showTimeData();      
-#endif
-          timer_count = 0;  
+         PH_watch.saveTimerDataToEEPROM();         
 }
 
 void arrange_reset_page() {  
@@ -196,7 +196,15 @@ void BT_receive() {
         //Serial.println(punchGoal);
     break;                                                                                                                                                                                                                      
    case  nothing: 
-   //Serial.println(F("nothing"));
+           //Serial.println(F("nothing"));
+             if(PH_watch.get_start_pause_status()) {
+                update_punch_timer();
+            } else {    
+              if(update_once) { 
+                update_punch_timer();     //pause mode only save punch counter and time data to eeprom once
+              }
+              update_once = false;
+          }             
     break;
   }  
 }

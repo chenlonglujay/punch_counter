@@ -26,7 +26,7 @@ enum watch_left_right{wLeft = 0, wRight} ;
 
 punchBT_slave punch_RL;
 punchCounterWatch PH_watch;
-Timer tp;
+Timer tp,tc;
 punchOLED punch_OLED;
 
 // ThreadController that will controll all threads
@@ -38,7 +38,7 @@ Thread* Thread_BT_transmit = new Thread();
 //Thread I2C OLED
 Thread* Thread_OLED = new Thread();
 
-#define TimerSmallestUnit 100
+#define TimerSmallestUnit 500
 #define start_pause_btn_pin 2      
 #define reset_page_btn_pin 3      //reset need press button 3 seconds
 
@@ -47,9 +47,9 @@ Thread* Thread_OLED = new Thread();
 
 #define sensitivity_pin A1
 #define battery_detect_pin  A0
-#define reset_check_arrive 30             //timer, TimerSmallestUnit  * reset_check_arrive
-#define second_check_arrive 10        //timer, TimerSmallestUnit  * second_check_arrive
-#define tenMin_check_arrive  600      //600s = 10 mintues
+#define reset_check_arrive second_check_arrive*3             //timer, TimerSmallestUnit  * reset_check_arrive
+#define second_check_arrive 2        //timer, TimerSmallestUnit  * second_check_arrive
+#define tenMin_check_arrive  second_check_arrive*60      //600s = 10 mintues
 
 
 //change switch  status  of  start/pause button
