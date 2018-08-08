@@ -20,6 +20,10 @@ enum watch_left_right{wLeft = 0, wRight} ;
 #endif
 #define show_time_serialMointor 0
 
+//test punch count
+#define use_test_add_punch_count 1
+#define test_add_punch_count 1887
+
 punchBT_slave punch_RL;
 punchCounterWatch PH_watch;
 Timer tp;

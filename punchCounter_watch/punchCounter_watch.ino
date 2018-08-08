@@ -145,9 +145,11 @@ void punchCounter_initial() {
           Serial.println("AT_mode");
 #else slave_Mode  
         punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);      
-        punchCountNow  = PH_watch.get_punchCounter();     
-        punchGoal = PH_watch.get_punchGoal();  
-        //Serial.println(punchCountNow);  
+        punchCountNow  = PH_watch.get_punchCounter();       
+ #if    use_test_add_punch_count
+          punchCountNow = punchCountNow + test_add_punch_count;
+ #endif        
+          punchGoal = PH_watch.get_punchGoal(); 
 #endif  
 }
 
@@ -205,8 +207,10 @@ void get_count_transmitData(punchBT_slave *input) {
   if(PH_watch.get_start_pause_status()){       
         punchCountNow  = PH_watch.getHumanPunchCount(); 
          //Serial.print("punchCount: ");
-         //Serial.println(punchCountNow);   
-         
+         //Serial.println(punchCountNow);            
+ #if    use_test_add_punch_count
+          punchCountNow = punchCountNow + test_add_punch_count;
+ #endif                 
         if(punchCountNow > punchCountBF) {
 #if  auto_pause_switch                     
             clear_auto_pasue();
