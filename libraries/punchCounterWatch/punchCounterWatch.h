@@ -21,6 +21,14 @@
 #define counter_max 4999
 #define page_counter_max 3
 #define punch_goal_default 4999
+#define highest_voltage 1023  //4V 
+#define lowest_voltage 750  //3V 
+/*  4.09:3 = 1023:x
+      x = 750
+*/
+//battery detect referance below
+//https://forum.arduino.cc/index.php?topic=420527.0
+
 
 enum EEPROM_save_address {
     punch_counterL = 0,

@@ -24,6 +24,7 @@ punchCounterWatch::~punchCounterWatch(void) {
 
 void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin
 , uint8_t batteryDetectPin) {
+    analogReference(INTERNAL);//an built-in reference, equal to 1.1(1024) volts on the ATmega328
 	count_sensitivity_pin = sensitivityPin;
 	battery_detect_pin = batteryDetectPin;
 	pinMode(sensitivityPin, INPUT);
@@ -166,7 +167,8 @@ int punchCounterWatch::getSensitivity() {
 }
 
 int punchCounterWatch::getHumanPunchCount() {
-	int SETY = getSensitivity();
+	float SETY_temp = getSensitivity() / 1.2;
+    int SETY = SETY_temp;
 	punchCounter = punch_count.get_punch_count(SETY,showDetail);
 	return punchCounter;	
 }
@@ -209,9 +211,31 @@ bool punchCounterWatch::get_start_pause_status() {
 }
 
 uint8_t punchCounterWatch::get_battery_percent() {
-	int val = analogRead(battery_detect_pin);	
-	float detect = (float)val / 1023.00;
-	detect = detect *100;
+	/*
+    highest voltage:4.09V(1023)
+    lowest voltage:3.0V(750)
+    You'll get an analogue value of 1023 when 1.1V is applied to the pin.
+    divider:
+    a suitable voltage divider consisting of two resistors, with the top connected to the battery
+    ,and the juncton of the resistors connected to the analogure input pin.
+    4.09V * 11k/(11k+30k) = 1.097V -->1023
+    3V * 11K/(11K+30K) = 0.804V -->750  
+    if 3.8V 
+    3.8 * 11K/(11K+29K) = 1.019V -->967
+    967 - 750 = 217
+    217 / 271(range) = 0.8
+    detect = 0.8 * 100 
+           = 80%  
+    */
+    int val = analogRead(battery_detect_pin);
+    Serial.print(F("read battery voltage:"));
+    Serial.println(val);
+    int range;
+    float detect;
+    val = val - lowest_voltage;
+	range = highest_voltage - lowest_voltage;   
+    detect = (float)val / range;   
+	detect = detect * 100;
 	val = (int)detect;
 	return val;  
 }

@@ -59,7 +59,7 @@ int PunchCounter::get_punch_count(int tuneSensitivity, bool printSW){
 	yAxis = adxl345.get_xyzAxis_org(yDataL, yDataH);
 	saveNow=yAxis;
 	//adxl345.show_xyzAxis_gravity();
-	if(abs(saveNow-saveBefore) >= (punchSensitivity+tuneSensitivity)){
+	if(abs(saveNow-saveBefore) >= (punchSensitivity-tuneSensitivity)){
 	  //move situation is fist punch and get back that will get data has big changed.
 		//freeze situation data only has small changed.
 		save_counter++;
