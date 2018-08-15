@@ -142,7 +142,6 @@ void showTimeData() {
 void punchCounter_initial() {
 #if AT_Mode
         punch_RL.punchBT_slave_initial_set(AT_mode, left_right);         
-          Serial.println("AT_mode");
 #else slave_Mode  
         punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);      
         punchCountNow  = PH_watch.get_punchCounter();       

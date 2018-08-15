@@ -9,8 +9,7 @@
 #include <punchOLED.h>
 #include "OLED_database_watch.c"
 
-enum watch_left_right{wLeft = 0, wRight} ;
-#define module_LR wLeft      //if this module is right module, please change this parameter become wRight
+#define module_LR 1   //if this module wanna be Right module, please set this parameter as 1
 #if module_LR
   #define punch_RL punch_R                
   #define left_right right              
@@ -42,8 +41,8 @@ Thread* Thread_OLED = new Thread();
 #define start_pause_btn_pin 2      
 #define reset_page_btn_pin 3      //reset need press button 3 seconds
 
-#define AT_Mode 0       //first,you need use AT_Mode to pair BT,please refer to BT_pair document
-#define slave_Mode 1   //second, use slave_Mode to recrive data from master or transmit data to master
+#define AT_Mode 0      //first,you need use AT_Mode to pair BT,please refer to BT_pair document
+#define slave_Mode 1  //second, use slave_Mode to recrive data from master or transmit data to master
 
 #define sensitivity_pin A1
 #define battery_detect_pin  A0

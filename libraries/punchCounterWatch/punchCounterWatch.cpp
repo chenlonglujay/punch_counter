@@ -228,8 +228,8 @@ uint8_t punchCounterWatch::get_battery_percent() {
            = 80%  
     */
     int val = analogRead(battery_detect_pin);
-    Serial.print(F("read battery voltage:"));
-    Serial.println(val);
+    //Serial.print(F("read battery voltage:"));
+    //Serial.println(val);
     int range;
     float detect;
     val = val - lowest_voltage;
