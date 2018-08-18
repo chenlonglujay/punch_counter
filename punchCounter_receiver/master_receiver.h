@@ -38,7 +38,7 @@ bool already_resetR = false;
 bool seg_change = 0;
 int S7L_vaule = 0, S7R_vaule = 0;
 uint8_t S7L_states = 0, S7R_states =0;
-#define  RL_total_goal 1000
+//#define  RL_total_goal 1000
 //----------------------------------------------------
 
 //----------------------------------------------------
@@ -68,9 +68,10 @@ bool now_play_next = 0;
 #include <ThreadController.h>
 // ThreadController that will controll all threads
 ThreadController controll = ThreadController();
-/*
+
 //Thread BT receiver 
 Thread* Thread_BT_receive = new Thread();
+/*
 //Thread BT transmit
 Thread* Thread_BT_transmit = new Thread();
 */

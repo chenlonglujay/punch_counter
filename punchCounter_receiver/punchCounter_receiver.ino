@@ -8,7 +8,7 @@ void setup() {
   Serial.begin(9600);  
   t1.every(TimerSmallestUnit,timerEvent);    
   PCR.initial_punchCounterReceiver(volume_knob_pin, Segcom_Low, Segcom_High         
-                                         , data_Pin, latch_Pin, clock_Pin , RL_total_goal) ;
+                                         , data_Pin, latch_Pin, clock_Pin ) ;
   PCR.initial_punchCounterMp3();                                     
   thread_initial();
   interrupt_initial();
@@ -40,8 +40,7 @@ void red_condition() {
         //1:setting goal mode
         red_timer_counter++;   
         if(!PCR.get_goal_mode()) {                 
-                if(red_timer_counter >= reset_check_arrive) {
- 
+                if(red_timer_counter >= reset_check_arrive) { 
                 //reset check
                   PCR.red_button_reset_check();
                   red_timer_counter = 0;
@@ -161,11 +160,11 @@ void thread_initial() {
   // Configure Thread_BT_transmit
   Thread_BT_transmit->onRun(BT_transmit);
   Thread_BT_transmit->setInterval(250);
-  
+  */
   // Configure Thread_BT_receive
   Thread_BT_receive->onRun(BT_receive);
-  Thread_BT_receive->setInterval(250);
-*/
+  Thread_BT_receive->setInterval(400);
+
  // Configure Thread_SEG7
   Thread_SEG7->onRun(SEG7_display);
   Thread_SEG7->setInterval(10);
@@ -176,12 +175,15 @@ void thread_initial() {
   Thread_mp3->setInterval(1000);
  
   // Adds all threads to the controller  
-  /*
-    controll.add(Thread_BT_transmit);
-    controll.add(Thread_BT_receive);  
-    */
+  
+   // controll.add(Thread_BT_transmit);
+    controll.add(Thread_BT_receive);      
     controll.add(Thread_SEG7);   
     controll.add(Thread_mp3);
+}
+
+void BT_receive() {
+  PCR.save_all_data_to_EEPROM();
 }
 
 void SEG7_display() {
@@ -189,13 +191,13 @@ void SEG7_display() {
         if(PCR.get_red_button_ST() == red_goal_mode ) {
               PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         } else if (PCR.get_red_button_ST() == red_inc_mode) {
-          PCR.set_left_arm_number_inc(20);
-          PCR.set_right_arm_number_inc(21);
+          PCR.set_left_arm_number_inc(20);      //test
+          PCR.set_right_arm_number_inc(21);     //test
           PCR.show_punch_data_on7SEG(seg_num, seg_num); 
         }  else if (PCR.get_red_button_ST() == red_countdown_mode) {
           PCR.set_left_arm_number_countdown(20);    //test
           PCR.set_right_arm_number_countdown(21);   //test
-          PCR.show_punch_data_on7SEG(seg_num, seg_num); 
+          PCR.show_punch_data_count_down_on7SEG(seg_num, seg_num); 
         } else if (PCR.get_red_button_ST() == red_reset_check_mode) {
          PCR.show_reset_check_on7SEG();
           PCR.set_green_cancel_reset();   

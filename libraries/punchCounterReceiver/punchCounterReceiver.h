@@ -151,6 +151,15 @@ setting_goal = 0
 typedef enum mp3Status{mp3_ST_pause = 0, mp3_ST_start}mp3_ST;
 typedef enum digits_dark_light_status{DTS_light = 0, DTS_dark}DTS_DL_ST;
 
+enum EEPROM_save_address {
+    punch_goalL = 0,
+    punch_goalH,
+    punchL_nowL,
+    punchL_nowH,
+    punchR_nowL,
+    punchR_nowH
+};
+
 class punchCounterReceiver
 {
 private:
@@ -160,13 +169,15 @@ private:
     int punch_total_goal;
     int punch_total_goal_setBF;
     int set_goal_L,set_goal_R;
-    void set_R_L_goal(int total_goal);
+    void set_R_L_goal();
     bool seg_switch_goal_now_punch;
     uint8_t mp3_status;
     red_ST red_button_ST;
     uint8_t red_ST_counter;
     int left_arm_number;
     int right_arm_number;
+    int left_arm_number_count_down;
+    int right_arm_number_count_down;
     uint8_t change_digits_counter;
     green_ST green_button_ST;
     digits_ST digits_button_ST;
@@ -181,10 +192,11 @@ public:
     punchCounterReceiver();
     ~punchCounterReceiver();
     void initial_punchCounterReceiver(uint8_t volume_Knob, uint8_t segcom_Low, uint8_t segcom_High
-                                 ,uint8_t data_pin, uint8_t latch_pin, uint8_t clock_pin, int total_goal);
+                                 ,uint8_t data_pin, uint8_t latch_pin, uint8_t clock_pin);
 
     void initial_punchCounterMp3();
     void show_punch_data_on7SEG(seg_show word_L, seg_show word_R);
+    void show_punch_data_count_down_on7SEG(seg_show word_L, seg_show word_R);
     void show_punch_total_goal_on7SEG(int goal_value);
     void show_reset_check_on7SEG();
     uint8_t get_volume_level();
@@ -225,6 +237,8 @@ public:
     int user_get_punch_total_goal();
     void save_punch_total_goal_set_before();
     void cancel_setting_punch_total_goal();
+    void save_all_data_to_EEPROM();
+    void read_all_data_from_EEPROM();
     //void punch_total_goal_reset();
     //void set_goal_ok();
 };
