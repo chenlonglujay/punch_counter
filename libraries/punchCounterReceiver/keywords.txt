@@ -11,24 +11,49 @@ punchCounterWatch	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-getPunchCountFromEEPROM		    KEYWORD2
-savePunchCountToEEPROM		    KEYWORD2
-punchCounterWatch_initial_set	KEYWORD2
-saveTimerDataToEEPROM		    KEYWORD2
-getTimerDataFromEEPROM	   	    KEYWORD2
-getHumanPunchCount		        KEYWORD2
-timer_add_1_second		        KEYWORD2
-getTimeData			            KEYWORD2
-resetAll			            KEYWORD2
-resetTime			            KEYWORD2
-resetPunch			            KEYWORD2
-set_start			            KEYWORD2
-set_pause			            KEYWORD2
-get_start_pause_status	   	    KEYWORD2
-get_battery_percent		        KEYWORD2
-get_sensitivity_percent		    KEYWORD2	
+initial_punchCounterReceiver    KEYWORD2    
+initial_punchCounterMp3         KEYWORD2
+show_punch_data_on7SEG          KEYWORD2
+show_punch_total_goal_on7SEG    KEYWORD2
+show_reset_check_on7SEG         KEYWORD2
+get_volume_level                KEYWORD2
+show_mp3player_message          KEYWORD2
+set_mp3_volume                  KEYWORD2
+mp3_play_selected               KEYWORD2
+mp3_play_previous               KEYWORD2
+mp3_play_next                   KEYWORD2
+mp3_pause                       KEYWORD2
+mp3_start                       KEYWORD2
+get_mp3_status                  KEYWORD2
+get_red_button_ST               KEYWORD2
+change_red_status               KEYWORD2
+red_button_reset                KEYWORD2
+red_button_reset_check          KEYWORD2
+set_left_arm_number_inc         KEYWORD2
+set_right_arm_number_inc        KEYWORD2
+set_left_arm_number_countdown   KEYOWRD2
+set_right_arm_number_countdown  KEYWORD2
+set_red_status_reset            KEYWORD2
+set_red_status_goal             KEYWORD2
+set_green_status_goal           KEYOWRD2
+set_green_status_play_next      KEYWORD2
+get_green_button_ST             KEYWORD2
+set_green_cancel_reset          KEYWORD2
+change_set_goal_digits          KEYWORD2
+get_digits_ST                   KEYWORD2
+digits_drak_light_change        KEYWORD2
+get_digits_dark_light_status    KEYWORD2
+set_digits_sw                   KEYWORD2
+get_digits_sw                   KEYWORD2
+inc_dec_digits_num              KEYWORD2
+set_digits                      KEYWORD2
 set_goal_mode                   KEYWORD2
 get_goal_mode                   KEYWORD2
+user_set_goal_ST                KEYWORD2
+user_get_goal_ST                KEYWORD2
+user_get_punch_total_goal       KEYWORD2
+save_punch_total_goal_set_before    KEYWORD2
+
 #######################################
 # Instances (KEYWORD2)
 #######################################

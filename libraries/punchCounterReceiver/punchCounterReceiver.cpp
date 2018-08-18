@@ -59,7 +59,7 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     s7.setPin_7seg(dataPin, latchPin, clockPin);
     s7.setPin_com(ctrl_com_pin);
     set_R_L_goal(total_goal);
-    show_punch_total_goal_on7SEG(); //initial show goal
+    show_punch_total_goal_on7SEG(0); //initial show goal
     pinMode(volume_Knob,INPUT);
 }
 
@@ -117,8 +117,8 @@ void punchCounterReceiver::show_punch_data_on7SEG(seg_show word_L, seg_show word
     s7.divide_and_output(right_arm_number, left_arm_number, word_L, word_R);
 }
 
-void punchCounterReceiver::show_punch_total_goal_on7SEG() {
-    s7.divide_and_output(0, punch_total_goal , seg_goal, seg_goal);
+void punchCounterReceiver::show_punch_total_goal_on7SEG(int goal_value) {
+    s7.divide_and_output(0, goal_value , seg_goal, seg_goal);
     /*
     GOAL(L)
     xxxx(R) total number
@@ -458,7 +458,8 @@ bool punchCounterReceiver::get_goal_mode() {
 void punchCounterReceiver::user_set_goal_ST() {
     if (!set_goal_ST_switch) {
         set_goal_ST_switch = !set_goal_ST_switch;
-        SGST = setting_goal_ok; 
+        SGST = setting_goal_cancel;
+        save_punch_total_goal_set_before(); 
     } else {
         set_goal_ST_switch = !set_goal_ST_switch;
         SGST = setting_goal; 
@@ -468,7 +469,20 @@ void punchCounterReceiver::user_set_goal_ST() {
 set_goal_ST punchCounterReceiver::user_get_goal_ST() {
     if (SGST == setting_goal)
         return setting_goal;
-    else if (SGST == setting_goal_ok)
-        return setting_goal_ok;
+    else if (SGST == setting_goal_cancel)
+        return setting_goal_cancel;
 }
 
+int punchCounterReceiver::user_get_punch_total_goal() {
+    return punch_total_goal;
+}
+
+void punchCounterReceiver::save_punch_total_goal_set_before() {
+    punch_total_goal_setBF = punch_total_goal;  
+}
+
+void punchCounterReceiver::cancel_setting_punch_total_goal() {
+
+    punch_total_goal = punch_total_goal_setBF;
+
+}

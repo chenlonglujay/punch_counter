@@ -90,7 +90,7 @@ press 3 seconds  show as below
 rESt 
 y n
 press red button once again will clean total and now count data
-press green button will cancel this reset
+press green  button will cancel this reset
 */
 #define green_button_pin 18
 /*    
@@ -101,8 +101,8 @@ GOAL
 xxxx
 press green button that can increase number(0-9 loop)
 press red  button that can choose thousands,hundreds,tens,units digit
-press  green button 3 seconds again will finish this setting
-press   red button 3 seconds again will cancel this setting
+press red button 3 seconds again will finish this setting
+press green button 3 seconds again will cancel this setting
 */
 
 //----------------------------------------------------

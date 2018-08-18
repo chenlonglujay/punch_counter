@@ -36,14 +36,29 @@ void red_condition() {
       red_timer_counter = 0;
       check_red_button_reset = 0;
    } else {
-      red_timer_counter++;    
+        //0:not setting goal mode
+        //1:setting goal mode
+        red_timer_counter++;   
+        if(!PCR.get_goal_mode()) {                 
                 if(red_timer_counter >= reset_check_arrive) {
+ 
                 //reset check
                   PCR.red_button_reset_check();
                   red_timer_counter = 0;
                   check_red_button_reset = 1;        
               }
-   }  
+        } else {           
+              if(red_timer_counter >= reset_check_arrive) {                  
+                     //setting goal ok
+                     red_timer_counter = 0;
+                     check_green_button_set = 1;    
+                     PCR.set_green_status_play_next();
+                     PCR.set_goal_mode(0);     
+                     PCR.set_digits_sw(0);  //turn off sw of digits drak or light     
+                     PCR.user_set_goal_ST();
+               }
+     }  
+   }
 }
 
 void green_condition() {
@@ -62,7 +77,6 @@ void green_condition() {
         if(PCR.user_get_goal_ST() == setting_goal){
                   if(green_timer_counter >= setGoal_arrive)  {
                    //setting goal
-                    //PCR.set_green_status_goal();    //?
                     green_timer_counter = 0;
                     check_green_button_set = 1;        
                     PCR.set_green_status_goal();   
@@ -72,14 +86,14 @@ void green_condition() {
                 }
         } else {
                 if(green_timer_counter >= setGoal_arrive)  {
-                    //setting goal ok
+                    //setting goal cancel
                      green_timer_counter = 0;
                      check_green_button_set = 1;    
                      PCR.set_green_status_play_next();
                      PCR.set_goal_mode(0);     
                      PCR.set_digits_sw(0);  //turn off sw of digits drak or light     
                      PCR.user_set_goal_ST();
-                   
+                     PCR.cancel_setting_punch_total_goal();
                 }
         }
      }  
@@ -173,21 +187,21 @@ void thread_initial() {
 void SEG7_display() {
     if(PCR.get_green_button_ST() != green_set_goal_mode) {
         if(PCR.get_red_button_ST() == red_goal_mode ) {
-              PCR.show_punch_total_goal_on7SEG();      
+              PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         } else if (PCR.get_red_button_ST() == red_inc_mode) {
           PCR.set_left_arm_number_inc(20);
           PCR.set_right_arm_number_inc(21);
           PCR.show_punch_data_on7SEG(seg_num, seg_num); 
         }  else if (PCR.get_red_button_ST() == red_countdown_mode) {
-          PCR.set_left_arm_number_countdown(20);
-          PCR.set_right_arm_number_countdown(21);
+          PCR.set_left_arm_number_countdown(20);    //test
+          PCR.set_right_arm_number_countdown(21);   //test
           PCR.show_punch_data_on7SEG(seg_num, seg_num); 
         } else if (PCR.get_red_button_ST() == red_reset_check_mode) {
          PCR.show_reset_check_on7SEG();
           PCR.set_green_cancel_reset();   
         } else if(PCR.get_red_button_ST() == red_reset_mode) {
             PCR.red_button_reset();
-            PCR.show_punch_total_goal_on7SEG();      
+            PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         }
     } /*else {
        PCR.set_digits_sw(0);  //turn off sw of digits drak light

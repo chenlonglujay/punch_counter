@@ -133,7 +133,7 @@ typedef enum digits_status{
 digits_units_mode = 0
 ,digits_tens_mode 
 ,digits_hundreds_mode
-,digits_thousands_mode 
+,digits_thousands_mode
 }digits_ST;
 
 typedef enum green_status{
@@ -145,7 +145,7 @@ green_play_next_mode = 0
 
 typedef enum set_goal_status{
 setting_goal = 0
-,setting_goal_ok
+,setting_goal_cancel
 }set_goal_ST;
 
 typedef enum mp3Status{mp3_ST_pause = 0, mp3_ST_start}mp3_ST;
@@ -158,6 +158,7 @@ private:
     uint8_t dataPin,latchPin,clockPin;  //seg7
     uint8_t ctrl_com_pin[com_num];
     int punch_total_goal;
+    int punch_total_goal_setBF;
     int set_goal_L,set_goal_R;
     void set_R_L_goal(int total_goal);
     bool seg_switch_goal_now_punch;
@@ -184,7 +185,7 @@ public:
 
     void initial_punchCounterMp3();
     void show_punch_data_on7SEG(seg_show word_L, seg_show word_R);
-    void show_punch_total_goal_on7SEG();
+    void show_punch_total_goal_on7SEG(int goal_value);
     void show_reset_check_on7SEG();
     uint8_t get_volume_level();
     void show_mp3player_message(uint8_t type, int value);
@@ -221,6 +222,9 @@ public:
     bool get_goal_mode();
     void user_set_goal_ST();
     set_goal_ST user_get_goal_ST();
+    int user_get_punch_total_goal();
+    void save_punch_total_goal_set_before();
+    void cancel_setting_punch_total_goal();
     //void punch_total_goal_reset();
     //void set_goal_ok();
 };
