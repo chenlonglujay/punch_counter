@@ -38,6 +38,8 @@ punchCounterReceiver::punchCounterReceiver(void) {
     goal_mode = false;
     SGST = setting_goal;
     set_goal_ST_switch = false;
+    SPD_L = pause_mode;
+    SPD_R = pause_mode;
 }
 
 punchCounterReceiver::~punchCounterReceiver(void) {
@@ -61,7 +63,13 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     set_R_L_goal();
     show_punch_total_goal_on7SEG(0); //initial show goal
     pinMode(volume_Knob,INPUT);
+    goal_mode = false;
+    SGST = setting_goal;
+    set_goal_ST_switch = false;
+    SPD_L = pause_mode;
+    SPD_R = pause_mode;
 }
+
 
 void punchCounterReceiver::initial_punchCounterMp3() {
     mySoftwareSerial.begin(9600);
@@ -532,3 +540,21 @@ void punchCounterReceiver::read_all_data_from_EEPROM() {
     right_arm_number = (tempH << 8) + tempL;
     right_arm_number_count_down = count_down - right_arm_number;
 }
+
+
+void punchCounterReceiver::user_set_start_pause_done_status_L(start_pause_done_ST val) {
+    SPD_L = val;
+}  
+
+void punchCounterReceiver::user_set_start_pause_done_status_R(start_pause_done_ST val) {
+    SPD_R = val;
+}
+
+start_pause_done_ST punchCounterReceiver::user_get_start_pause_done_status_L() {
+    return SPD_L;
+}
+
+start_pause_done_ST punchCounterReceiver::user_get_start_pause_done_status_R() {
+    return SPD_R;
+}
+

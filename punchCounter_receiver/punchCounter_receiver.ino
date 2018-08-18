@@ -191,13 +191,9 @@ void SEG7_display() {
         if(PCR.get_red_button_ST() == red_goal_mode ) {
               PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         } else if (PCR.get_red_button_ST() == red_inc_mode) {
-          PCR.set_left_arm_number_inc(20);      //test
-          PCR.set_right_arm_number_inc(21);     //test
-          PCR.show_punch_data_on7SEG(seg_num, seg_num); 
+            deal_with_display_punch_pause_done();
         }  else if (PCR.get_red_button_ST() == red_countdown_mode) {
-          PCR.set_left_arm_number_countdown(20);    //test
-          PCR.set_right_arm_number_countdown(21);   //test
-          PCR.show_punch_data_count_down_on7SEG(seg_num, seg_num); 
+            deal_with_display_punch_pause_done_count_down();                 
         } else if (PCR.get_red_button_ST() == red_reset_check_mode) {
          PCR.show_reset_check_on7SEG();
           PCR.set_green_cancel_reset();   
@@ -214,6 +210,58 @@ void SEG7_display() {
             PCR. set_digits();
         }      
     }
+}
+
+void deal_with_display_punch_pause_done() {
+    //PCR.user_set_start_pause_done_status_L(pause_mode);  //test    
+    //PCR.user_set_start_pause_done_status_R(start_mode);  //test
+    PCR.set_left_arm_number_inc(20);      //test
+    PCR.set_right_arm_number_inc(21);     //test
+     if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+          PCR.show_punch_data_on7SEG(seg_pause, seg_pause);
+      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
+          PCR.show_punch_data_on7SEG(seg_num, seg_pause);
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+          PCR.show_punch_data_on7SEG(seg_pause, seg_num);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_on7SEG(seg_done, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+          PCR.show_punch_data_on7SEG(seg_done, seg_num);
+      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_on7SEG(seg_num,seg_done );
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_on7SEG(seg_pause, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_on7SEG(seg_pause, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() ==  pause_mode)  {
+          PCR.show_punch_data_on7SEG(seg_done, seg_pause);
+      }
+}
+
+void deal_with_display_punch_pause_done_count_down() {
+    //PCR.user_set_start_pause_done_status_L(pause_mode);  //test
+    //PCR.user_set_start_pause_done_status_R(done_mode);  //test
+    PCR.set_left_arm_number_countdown(20);    //test
+    PCR.set_right_arm_number_countdown(21);   //test
+      if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+          PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_pause);
+      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_num, seg_pause);
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_num);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_done, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_done, seg_num);
+      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_num,seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+          PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_done);
+      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() ==  pause_mode)  {
+          PCR.show_punch_data_count_down_on7SEG(seg_done, seg_pause);
+      }
 }
 
 void mp3_player() { 

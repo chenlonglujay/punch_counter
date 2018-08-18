@@ -151,6 +151,13 @@ setting_goal = 0
 typedef enum mp3Status{mp3_ST_pause = 0, mp3_ST_start}mp3_ST;
 typedef enum digits_dark_light_status{DTS_light = 0, DTS_dark}DTS_DL_ST;
 
+typedef enum start_pause_done_status{
+pause_mode = 0 
+,start_mode
+,done_mode
+}start_pause_done_ST;
+
+
 enum EEPROM_save_address {
     punch_goalL = 0,
     punch_goalH,
@@ -188,6 +195,7 @@ private:
     bool goal_mode;
     set_goal_ST SGST;
     bool set_goal_ST_switch;
+    start_pause_done_ST SPD_L,SPD_R;
 public:
     punchCounterReceiver();
     ~punchCounterReceiver();
@@ -239,6 +247,10 @@ public:
     void cancel_setting_punch_total_goal();
     void save_all_data_to_EEPROM();
     void read_all_data_from_EEPROM();
+    void user_set_start_pause_done_status_L(start_pause_done_ST val);
+    void user_set_start_pause_done_status_R(start_pause_done_ST val);
+    start_pause_done_ST user_get_start_pause_done_status_L();
+    start_pause_done_ST user_get_start_pause_done_status_R();
     //void punch_total_goal_reset();
     //void set_goal_ok();
 };
