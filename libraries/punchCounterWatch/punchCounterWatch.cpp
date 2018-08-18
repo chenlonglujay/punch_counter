@@ -221,7 +221,7 @@ uint8_t punchCounterWatch::get_battery_percent() {
     4.09V * 11k/(11k+30k) = 1.097V -->1023
     3V * 11K/(11K+30K) = 0.804V -->750  
     if 3.8V 
-    3.8 * 11K/(11K+29K) = 1.019V -->967
+    3.8 * 11K/(11K+30K) = 1.019V -->967
     967 - 750 = 217
     217 / 271(range) = 0.8
     detect = 0.8 * 100 
@@ -232,11 +232,15 @@ uint8_t punchCounterWatch::get_battery_percent() {
     //Serial.println(val);
     int range;
     float detect;
-    val = val - lowest_voltage;
-	range = highest_voltage - lowest_voltage;   
-    detect = (float)val / range;   
-	detect = detect * 100;
-	val = (int)detect;
+    if(val <= lowest_voltage) {
+        val = 0;
+    } else {
+        val = val - lowest_voltage;
+	    range = highest_voltage - lowest_voltage;   
+        detect = (float)val / range;   
+	    detect = detect * 100;
+	    val = (int)detect;
+    }
 	return val;  
 }
 
