@@ -1,6 +1,8 @@
 #ifndef MASTER_RECEIVER_h
 #define MASTER_RECEIVER_h
 //Master:Arduino Mega 2560
+#include <punchCounterReceiver.h> 
+punchCounterReceiver PCR;
 
 //----------------------------------------------------
 //BT:

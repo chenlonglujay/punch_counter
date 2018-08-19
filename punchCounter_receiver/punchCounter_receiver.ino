@@ -1,7 +1,4 @@
 #include "master_receiver.h"
-#include <punchCounterReceiver.h> 
-
-punchCounterReceiver PCR;
 
 
 void setup() {
@@ -15,8 +12,8 @@ void setup() {
  
 #if AT_Mode
   Serial.println("enter AT commands");
-    punch_BT_L.punchBT_master_initial_set(serial2, AT_mode,left);
-  //punch_BT_R.punchBT_master_initial_set(serial3, AT_mode,right);
+    //punch_BT_L.punchBT_master_initial_set(serial2, AT_mode,left);
+  punch_BT_R.punchBT_master_initial_set(serial3, AT_mode,right);
 #else if   Master_Mode
  Serial.println("Master_Mode");
  punch_BT_L.punchBT_master_initial_set(serial2, Master_mode,left);
@@ -112,8 +109,8 @@ void digits_sw_condition() {
 
 void loop() {
  #if AT_Mode  
-    punch_BT_L.AT_mode_function();
-    //punch_BT_R.AT_mode_function();
+    //punch_BT_L.AT_mode_function();
+    punch_BT_R.AT_mode_function();
  #else if  Master_Mode
      t1.update();
      controll.run();
@@ -190,21 +187,37 @@ void BT_transmit() {
 }
 
 void BT_receive() {
-
-  PCR.user_set_start_pause_done_status_L(start_mode);  //test    
-  PCR.user_set_start_pause_done_status_R(start_mode);  //test
   int reL = punch_BT_L.Master_mode_receive();
   int reR = punch_BT_R.Master_mode_receive();  
   int total_half = PCR.user_get_punch_total_goal()/2;
    
-   if(reL > 0 && reL <  total_half ){
-     PCR.set_left_arm_number_inc(reL);      
+   if(reL >= 0 && reL <  total_half ){
+    Serial.println("reL");
+    PCR.user_set_start_pause_done_status_L(start_mode);  
+     PCR.set_left_arm_number_inc(reL);         
      PCR.set_left_arm_number_countdown(reL);    
-   }  
-    if(reR > 0 && reR<  total_half ){
-      PCR.set_right_arm_number_inc(reR);    
+   } else if(reL == 10000){
+    //pause
+    Serial.println("pause L");
+      PCR.user_set_start_pause_done_status_L(pause_mode);      
+   } else if(reL == total_half) {
+    //done
+     PCR.user_set_start_pause_done_status_L(done_mode);  
+   }
+
+   
+    if(reR >= 0 && reR<  total_half ){
+      PCR.user_set_start_pause_done_status_R(start_mode);  
+      PCR.set_right_arm_number_inc(reR);          
       PCR.set_right_arm_number_countdown(reR);    
-   }  
+   } else if(reR == 10000){
+    //pause
+      PCR.user_set_start_pause_done_status_R(pause_mode);      
+   } else if(reR == total_half) {
+    //done
+     PCR.user_set_start_pause_done_status_R(done_mode);  
+   }
+   
    PCR.save_all_data_to_EEPROM();
 }
 
@@ -235,57 +248,49 @@ void SEG7_display() {
 }
 
 void deal_with_display_punch_pause_done() {
-    //PCR.user_set_start_pause_done_status_L(pause_mode);  //test    
-    //PCR.user_set_start_pause_done_status_R(start_mode);  //test
-   //PCR.set_left_arm_number_inc(28);      //test
-   //PCR.set_right_arm_number_inc(21);     //test
-    if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == start_mode ) {
+    if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == start_mode ) {
           PCR.show_punch_data_on7SEG(seg_num, seg_num);
-     } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+     } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == pause_mode ) {
           PCR.show_punch_data_on7SEG(seg_pause, seg_pause);
-      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == pause_mode )  {
           PCR.show_punch_data_on7SEG(seg_num, seg_pause);
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == start_mode )  {
           PCR.show_punch_data_on7SEG(seg_pause, seg_num);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_on7SEG(seg_done, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() == start_mode )  {
           PCR.show_punch_data_on7SEG(seg_done, seg_num);
-      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_on7SEG(seg_num,seg_done );
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_on7SEG(seg_pause, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_on7SEG(seg_pause, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() ==  pause_mode)  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() ==  pause_mode)  {
           PCR.show_punch_data_on7SEG(seg_done, seg_pause);
       }
 }
 
 void deal_with_display_punch_pause_done_count_down() {
-    //PCR.user_set_start_pause_done_status_L(pause_mode);  //test
-    //PCR.user_set_start_pause_done_status_R(done_mode);  //test
-    //PCR.set_left_arm_number_countdown(20);    //test
-    //PCR.set_right_arm_number_countdown(21);   //test
-    if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == start_mode ) {
+    if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == start_mode ) {
           PCR.show_punch_data_count_down_on7SEG(seg_num, seg_num);
-     } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+     } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == pause_mode ) {
           PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_pause);
-      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == pause_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_num, seg_pause);
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == start_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_num);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_done, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() == start_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() == start_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_done, seg_num);
-      } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == start_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_num,seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == done_mode )  {
+      } else if(PCR.user_get_start_pause_done_status_L() == pause_mode && PCR.user_get_start_pause_done_status_R() == done_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_done);
-      } else if(PCR.user_get_start_pause_done_status_R() == done_mode && PCR.user_get_start_pause_done_status_L() ==  pause_mode)  {
+      } else if(PCR.user_get_start_pause_done_status_L() == done_mode && PCR.user_get_start_pause_done_status_R() ==  pause_mode)  {
           PCR.show_punch_data_count_down_on7SEG(seg_done, seg_pause);
       }
 }

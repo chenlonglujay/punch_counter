@@ -70,6 +70,10 @@ typedef enum chooseDir {left='l', right='r'} ch_dir;
 typedef enum chooseSerial {serial1=1, serial2 ,serial3} ch_serial;
 typedef enum chooseMode {AT_mode=0, Master_mode} ch_mode;
 typedef enum choosePunch_Pause {punch=0, pause} ch_punch_pause;
+enum BT_recives_status {BT_pause = 10000, BT_nothing = 10001};
+
+
+
 #define BT_baudrate 38400
 class punchBT_master
 {

@@ -270,6 +270,8 @@ void punchCounterReceiver::red_button_reset() {
     left_arm_number_count_down = 0;
     right_arm_number_count_down = 0;
     punch_total_goal = default_R_L_total;
+    user_set_start_pause_done_status_L(pause_mode);
+    user_set_start_pause_done_status_R(pause_mode);
     set_goal_L = 0;
     set_goal_R = 0;
     mp3_start();

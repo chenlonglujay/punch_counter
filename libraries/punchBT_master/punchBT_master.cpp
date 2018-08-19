@@ -77,19 +77,19 @@ int punchBT_master::Master_mode_receive(){
 			arrangeData = 0;
 			if(serialN	== serial1) {
 					if (Serial1.available()) {
-          	val = Serial1.read();  
+          	            val = Serial1.read();  
 						//Serial.println(val);
-        		receive_data_function(&val, &receiveSeq, receiveData_buf);               
+        		        receive_data_function(&val, &receiveSeq, receiveData_buf);               
 					}        
 			} else if (serialN == serial2) {
 					if (Serial2.available()) {
-          	val = Serial2.read();    
-        		receive_data_function(&val, &receiveSeq, receiveData_buf);               
+          	            val = Serial2.read();    
+        		        receive_data_function(&val, &receiveSeq, receiveData_buf);               
 					}        
-  		} else if (serialN == serial3) {
+  		    } else if (serialN == serial3) {
 					if (Serial3.available()) {
-          	val = Serial3.read();    
-        		receive_data_function(&val, &receiveSeq, receiveData_buf);               
+          	            val = Serial3.read();    
+        		        receive_data_function(&val, &receiveSeq, receiveData_buf);               
 					}        
 			}
       
@@ -97,15 +97,15 @@ int punchBT_master::Master_mode_receive(){
 					receiveSeq = 0;
 					if(punch_pause == pause){
 						//Serial.println("pause");
-						return 10000;		//10000 = pause			
+						return BT_pause;		//10000 = pause			
 					} else {
-          	arrange_receive_data(receiveData_buf,&arrangeData);	
+          	            arrange_receive_data(receiveData_buf,&arrangeData);	
 						return arrangeData; //0-9999(max)
 					}
 			}       
 		  
 	} 
-	return 0;  	
+	return BT_nothing;  	
 }
 
 void punchBT_master::receive_data_function(char *val, uint8_t *seq, uint8_t *receive_data_buf) {
