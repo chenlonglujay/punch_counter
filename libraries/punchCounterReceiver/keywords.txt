@@ -63,6 +63,8 @@ user_get_start_pause_done_status_R  KEYWORD2
 user_setting_goal_ok            KEYWORD2   
 user_setting_goal_now           KEYWORD2                                                                                                     
 user_setting_goal_cancel        KEYWORD2
+user_set_transmit_reset_flag    KEYWORD2                                                                                                       
+user_get_transmit_reset_flag    KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################

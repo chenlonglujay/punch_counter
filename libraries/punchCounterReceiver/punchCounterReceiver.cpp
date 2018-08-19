@@ -40,6 +40,7 @@ punchCounterReceiver::punchCounterReceiver(void) {
     set_goal_ST_switch = false;
     SPD_L = start_mode;
     SPD_R = start_mode;
+    transmit_reset_flag = false;
 }
 
 punchCounterReceiver::~punchCounterReceiver(void) {
@@ -68,6 +69,7 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     set_goal_ST_switch = false;
     SPD_L = start_mode;
     SPD_R = start_mode;
+    transmit_reset_flag = false;
 }
 
 
@@ -596,4 +598,12 @@ void punchCounterReceiver::user_setting_goal_cancel() {
     set_digits_sw(0);  //turn off sw of digits drak or light     
     user_set_goal_ST();
     cancel_setting_punch_total_goal();
+}
+
+void punchCounterReceiver::user_set_transmit_reset_flag() {
+    transmit_reset_flag = !transmit_reset_flag;
+}
+
+bool punchCounterReceiver::user_get_transmit_reset_flag() {
+    return transmit_reset_flag;
 }

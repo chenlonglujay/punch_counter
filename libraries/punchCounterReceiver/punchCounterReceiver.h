@@ -196,6 +196,7 @@ private:
     set_goal_ST SGST;
     bool set_goal_ST_switch;
     start_pause_done_ST SPD_L,SPD_R;
+    bool transmit_reset_flag;
 public:
     punchCounterReceiver();
     ~punchCounterReceiver();
@@ -254,5 +255,7 @@ public:
     void user_setting_goal_ok();
     void user_setting_goal_now();
     void user_setting_goal_cancel();
+    void user_set_transmit_reset_flag();
+    bool user_get_transmit_reset_flag();
 };
 #endif

@@ -183,21 +183,21 @@ void punchBT_master::Master_mode_transmit_reset() {
 		if(mode == Master_mode) {
 			if(serialN	== serial1) {
 					if(dir == left){
-						Serial1.print("lRSET.");
+						Serial1.print("lREST.");
 					} else {
-						Serial1.print("rRSET.");
+						Serial1.print("rREST.");
 					}
 			} else if (serialN == serial2) {
 					if(dir == left){
-						Serial1.print("lRSET.");
+						Serial2.print("lREST.");
 					} else {
-						Serial1.print("rRSET.");
+						Serial2.print("rREST.");
 					}
   		} else if (serialN == serial3) {
 					if(dir == left){
-						Serial1.print("lRSET.");
+						Serial3.print("lREST.");
 					} else {
-						Serial1.print("rRSET.");
+						Serial3.print("rREST.");
 					}
 			}
 			

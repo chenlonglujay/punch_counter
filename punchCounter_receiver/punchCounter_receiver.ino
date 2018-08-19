@@ -132,7 +132,15 @@ void thread_initial() {
     controll.add(Thread_mp3);
 }
 
-void BT_transmit() {
+void BT_transmit() {   
+  if(PCR.user_get_transmit_reset_flag()) {
+        punch_BT_L.Master_mode_transmit_reset();    
+        punch_BT_R.Master_mode_transmit_reset();
+        //Serial.println("BT_transmit reset");
+        PCR.user_set_transmit_reset_flag();
+  }
+
+  
  /*
  #if AT_Mode  
     punch_BT_R.AT_mode_function();
@@ -154,25 +162,7 @@ void BT_transmit() {
   } else if (reL == 10000){
       Serial.println("slaveL is pause!!");
   }
-  
- int reR = punch_BT_R.Master_mode_receive();
- if(reR >0 && reR <10000){
-     Serial.print("receive val_right: ");
-     Serial.println(reR); 
-     if(reR == 5) {
-       if(!already_resetR) {   
-            Serial.println("master is reset send reset signal to slaveR");
-            punch_BT_R.Master_mode_transmit_reset();
-       }
-        already_resetR = true;
-     } else if(reR == 1) {
-        already_resetR = false;
-     }
-  } else if (reR == 10000){
-      Serial.println("slaveR is pause!!");
-  }
- #endif
- */
+*/
   
 }
 
@@ -182,13 +172,13 @@ void BT_receive() {
   int total_half = PCR.user_get_punch_total_goal()/2;
    
    if(reL >= 0 && reL <  total_half ){
-    Serial.println("reL");
+    //Serial.println("reL");
     PCR.user_set_start_pause_done_status_L(start_mode);  
      PCR.set_left_arm_number_inc(reL);         
      PCR.set_left_arm_number_countdown(reL);    
    } else if(reL == 10000){
     //pause
-    Serial.println("pause L");
+    //Serial.println("pause L");
       PCR.user_set_start_pause_done_status_L(pause_mode);      
    } else if(reL == total_half) {
     //done
@@ -223,7 +213,8 @@ void SEG7_display() {
          PCR.show_reset_check_on7SEG();
           PCR.set_green_cancel_reset();   
         } else if(PCR.get_red_button_ST() == red_reset_mode) {
-            PCR.red_button_reset();
+            PCR.red_button_reset();    
+            PCR.user_set_transmit_reset_flag(); 
             PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         }
     } /*else {
@@ -321,8 +312,6 @@ void interrupt_initial() {
           digitalWrite(red_button_pin, HIGH); //turn on pullup resistors
           digitalWrite(green_button_pin, HIGH);  //turn on pullup resistors
           digitalWrite(mp3_button_pin, HIGH);
-           //pinMode(red_button_pin,INPUT);        
-          // pinMode(green_button_pin,INPUT);    
           pinMode(mp3_button_pin,INPUT);       
            get_mp3_button_value();   
           delay(100);    

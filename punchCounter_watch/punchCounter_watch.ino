@@ -72,7 +72,7 @@ void arrange_reset_page() {
 }
 
 void reset_data_count() {
-         Serial.println("resetAll");
+         //Serial.println("resetAll");
           PH_watch.resetAll();       
            timer_reset_page_count = 0;                                                    
            reset_data(&punch_RL);                        //transmit count=0
@@ -360,6 +360,7 @@ void  sensitivity_div_cul(punch_count_digit  *sen){
 void reset_data(punchBT_slave *input) {
     input->set_transmitData(0);  
     punchCountNow = 0;
+    punchCountBF = 0;
 }
 
 void transmit_data(punchBT_slave *input, int count, bool show_data) {
