@@ -17,6 +17,7 @@ punchCounterWatch::punchCounterWatch(void) {
 	TMSF.hour = 0;
 	TMSF.day = 0;
     page_counter = 0;
+    punch_pause_switch_do_once_transmit = 0;
 }
 
 punchCounterWatch::~punchCounterWatch(void) {
@@ -37,6 +38,7 @@ void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin
     punch_goal = getPunchGoalFromEEPROM();
 	//Serial.println(F("punch_goal initial:"));
 	//Serial.println(punch_goal);
+    punch_pause_switch_do_once_transmit = 0;
     set_pause();
 }
 
@@ -204,6 +206,7 @@ void punchCounterWatch::set_start() {
 
 void punchCounterWatch::set_pause() {
 	start_pause_status = watch_pause;
+    punch_pause_switch_do_once_transmit = !punch_pause_switch_do_once_transmit;
 }
 
 bool punchCounterWatch::get_start_pause_status() {
@@ -335,4 +338,10 @@ transmit_BT_reset punchCounterWatch::get_transmit_BT_reset() {
     return TBR;
 }
 
+bool punchCounterWatch::get_punch_pause_switch_do_once_transmit() {
+    return punch_pause_switch_do_once_transmit;
+}
 
+void punchCounterWatch::set_punch_pause_switch_do_once_transmit() {
+    punch_pause_switch_do_once_transmit = !punch_pause_switch_do_once_transmit;
+}

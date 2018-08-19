@@ -33,7 +33,8 @@ get_page_count   		KEYWORD2
 change_page_check   		KEYWORD2	
 get_punchCounter     		KEYWORD2
 get_punchGoal			KEYWORD2
-
+get_punch_pause_switch_do_once_transmit KEYWORD2
+set_punch_pause_switch_do_once_transmit KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################

@@ -75,6 +75,7 @@ private:
     uint8_t page_counter;
     bool change_page;
     transmit_BT_reset TBR;
+    bool punch_pause_switch_do_once_transmit;
 public:
 	punchCounterWatch();
 	~punchCounterWatch();
@@ -105,6 +106,8 @@ public:
     goal_finish check_goal_done(int goal, int punch_now);
     void set_transmit_BT_reset(transmit_BT_reset val);
     transmit_BT_reset get_transmit_BT_reset();
+    bool get_punch_pause_switch_do_once_transmit();
+    void set_punch_pause_switch_do_once_transmit();
 };
 
 #endif

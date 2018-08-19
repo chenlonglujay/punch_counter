@@ -20,7 +20,7 @@ test_BT_slave
 5.設定BT為slave,輸入AT+ROLE=0
 6.輸入AT+ROLE? 觀察回傳是否是+ROLE=0
 7.輸入AT+ADDR? 紀錄下回傳數值 等等要配給master
-ex：+ADDR:98d3:34:9085bd--->記下9085bd
+ex：+ADDR:98d3:34:9085bd--->記下98d3:34:9085bd
 
 
 master端燒錄程式test_BT

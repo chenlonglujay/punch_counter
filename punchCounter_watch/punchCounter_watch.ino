@@ -212,6 +212,11 @@ void get_count_transmitData(punchBT_slave *input) {
   bool show_data = false;
           
   if(PH_watch.get_start_pause_status()){       
+        if(PH_watch.get_punch_pause_switch_do_once_transmit()) {
+            transmit_data(input, punchCountBF, show_data);
+            PH_watch.set_punch_pause_switch_do_once_transmit();
+            return;
+        }
         punchCountNow  = PH_watch.getHumanPunchCount(); 
          //Serial.print("punchCount: ");
          //Serial.println(punchCountNow);            
@@ -223,7 +228,7 @@ void get_count_transmitData(punchBT_slave *input) {
             clear_auto_pasue();
 #endif           
             transmit_data(input, punchCountNow, show_data);
-        } else if (punchCountNow == punchCountBF)  {
+        } else if (punchCountNow == punchCountBF)  {           
  #if  auto_pause_switch             
             autoPause = true;
  #endif
