@@ -15,12 +15,12 @@ void setup() {
  
 #if AT_Mode
   Serial.println("enter AT commands");
-  punch_BT_R.punchBT_master_initial_set(serial3, AT_mode,right);
-  //punch_BT_L.punchBT_master_initial_set(serial2, AT_mode,left);
+    punch_BT_L.punchBT_master_initial_set(serial2, AT_mode,left);
+  //punch_BT_R.punchBT_master_initial_set(serial3, AT_mode,right);
 #else if   Master_Mode
- Serial.println("receive_Mode");
- punch_BT_R.punchBT_master_initial_set(serial3, Master_mode,right);
+ Serial.println("Master_Mode");
  punch_BT_L.punchBT_master_initial_set(serial2, Master_mode,left);
+ punch_BT_R.punchBT_master_initial_set(serial3, Master_mode,right);
 #endif
 }
 
@@ -111,9 +111,42 @@ void digits_sw_condition() {
 }
 
 void loop() {
-     t1.update(); 
-    controll.run();
-  /*
+ #if AT_Mode  
+    punch_BT_L.AT_mode_function();
+    //punch_BT_R.AT_mode_function();
+ #else if  Master_Mode
+     t1.update();
+     controll.run();
+ #endif
+}
+
+void thread_initial() {
+  
+  // Configure Thread_BT_transmit
+  Thread_BT_transmit->onRun(BT_transmit);
+  Thread_BT_transmit->setInterval(150);
+  
+  // Configure Thread_BT_receive
+  Thread_BT_receive->onRun(BT_receive);
+  Thread_BT_receive->setInterval(150);
+
+ // Configure Thread_SEG7
+  Thread_SEG7->onRun(SEG7_display);
+  Thread_SEG7->setInterval(10);
+  
+   // Configure Thread_mp3
+  Thread_mp3->onRun(mp3_player);
+  Thread_mp3->setInterval(1000);
+ 
+  // Adds all threads to the controller    
+    controll.add(Thread_BT_transmit);
+    controll.add(Thread_BT_receive);      
+    controll.add(Thread_SEG7);   
+    controll.add(Thread_mp3);
+}
+
+void BT_transmit() {
+ /*
  #if AT_Mode  
     punch_BT_R.AT_mode_function();
     //punch_BT_L.AT_mode_function();
@@ -153,37 +186,26 @@ void loop() {
   }
  #endif
  */
-}
-
-void thread_initial() {
-  /*
-  // Configure Thread_BT_transmit
-  Thread_BT_transmit->onRun(BT_transmit);
-  Thread_BT_transmit->setInterval(250);
-  */
-  // Configure Thread_BT_receive
-  Thread_BT_receive->onRun(BT_receive);
-  Thread_BT_receive->setInterval(400);
-
- // Configure Thread_SEG7
-  Thread_SEG7->onRun(SEG7_display);
-  Thread_SEG7->setInterval(10);
   
-
-   // Configure Thread_mp3
-  Thread_mp3->onRun(mp3_player);
-  Thread_mp3->setInterval(1000);
- 
-  // Adds all threads to the controller  
-  
-   // controll.add(Thread_BT_transmit);
-    controll.add(Thread_BT_receive);      
-    controll.add(Thread_SEG7);   
-    controll.add(Thread_mp3);
 }
 
 void BT_receive() {
-  PCR.save_all_data_to_EEPROM();
+
+  PCR.user_set_start_pause_done_status_L(start_mode);  //test    
+  PCR.user_set_start_pause_done_status_R(start_mode);  //test
+  int reL = punch_BT_L.Master_mode_receive();
+  int reR = punch_BT_R.Master_mode_receive();  
+  int total_half = PCR.user_get_punch_total_goal()/2;
+   
+   if(reL > 0 && reL <  total_half ){
+     PCR.set_left_arm_number_inc(reL);      
+     PCR.set_left_arm_number_countdown(reL);    
+   }  
+    if(reR > 0 && reR<  total_half ){
+      PCR.set_right_arm_number_inc(reR);    
+      PCR.set_right_arm_number_countdown(reR);    
+   }  
+   PCR.save_all_data_to_EEPROM();
 }
 
 void SEG7_display() {
@@ -215,9 +237,11 @@ void SEG7_display() {
 void deal_with_display_punch_pause_done() {
     //PCR.user_set_start_pause_done_status_L(pause_mode);  //test    
     //PCR.user_set_start_pause_done_status_R(start_mode);  //test
-    PCR.set_left_arm_number_inc(20);      //test
-    PCR.set_right_arm_number_inc(21);     //test
-     if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+   //PCR.set_left_arm_number_inc(28);      //test
+   //PCR.set_right_arm_number_inc(21);     //test
+    if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == start_mode ) {
+          PCR.show_punch_data_on7SEG(seg_num, seg_num);
+     } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
           PCR.show_punch_data_on7SEG(seg_pause, seg_pause);
       } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
           PCR.show_punch_data_on7SEG(seg_num, seg_pause);
@@ -241,9 +265,11 @@ void deal_with_display_punch_pause_done() {
 void deal_with_display_punch_pause_done_count_down() {
     //PCR.user_set_start_pause_done_status_L(pause_mode);  //test
     //PCR.user_set_start_pause_done_status_R(done_mode);  //test
-    PCR.set_left_arm_number_countdown(20);    //test
-    PCR.set_right_arm_number_countdown(21);   //test
-      if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
+    //PCR.set_left_arm_number_countdown(20);    //test
+    //PCR.set_right_arm_number_countdown(21);   //test
+    if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == start_mode ) {
+          PCR.show_punch_data_count_down_on7SEG(seg_num, seg_num);
+     } else if(PCR.user_get_start_pause_done_status_R() == pause_mode && PCR.user_get_start_pause_done_status_L() == pause_mode ) {
           PCR.show_punch_data_count_down_on7SEG(seg_pause, seg_pause);
       } else if(PCR.user_get_start_pause_done_status_R() == start_mode && PCR.user_get_start_pause_done_status_L() == pause_mode )  {
           PCR.show_punch_data_count_down_on7SEG(seg_num, seg_pause);
@@ -317,7 +343,7 @@ void switch_goal_nowData_ISR() {
               unsigned long interrupt_time = millis();     
               if (interrupt_time - last_interrupt_time > 200) {      
                   if(PCR.get_green_button_ST() != green_set_goal_mode) {
-                        //1 no reset,0 already reset check
+                        //1 not reset,0 already reset check
                          if(PCR.get_red_button_ST() != red_reset_check_mode && PCR.get_red_button_ST() != red_reset_mode ){
                                 PCR.change_red_status();                                                   
                          } else if(PCR.get_red_button_ST() == red_reset_check_mode && check_red_button_reset == 0) {

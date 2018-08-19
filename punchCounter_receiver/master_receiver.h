@@ -71,10 +71,10 @@ ThreadController controll = ThreadController();
 
 //Thread BT receiver 
 Thread* Thread_BT_receive = new Thread();
-/*
+
 //Thread BT transmit
 Thread* Thread_BT_transmit = new Thread();
-*/
+
 //Thread seven segment
 Thread* Thread_SEG7 = new Thread();
 Thread* Thread_mp3 = new Thread();

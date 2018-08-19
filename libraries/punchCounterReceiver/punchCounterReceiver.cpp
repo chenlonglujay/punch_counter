@@ -121,12 +121,12 @@ void punchCounterReceiver::set_R_L_goal() {
 }
 
 void punchCounterReceiver::show_punch_data_on7SEG(seg_show word_L, seg_show word_R) {
-    s7.divide_and_output(right_arm_number, left_arm_number, word_L, word_R);
+    s7.divide_and_output(left_arm_number, right_arm_number, word_L, word_R);
 }
 
 void punchCounterReceiver::show_punch_data_count_down_on7SEG(seg_show word_L, seg_show word_R) {
     set_R_L_goal();
-    s7.divide_and_output(right_arm_number_count_down, left_arm_number_count_down, word_L, word_R);
+    s7.divide_and_output(left_arm_number_count_down, right_arm_number_count_down, word_L, word_R);
 }
 
 void punchCounterReceiver::show_punch_total_goal_on7SEG(int goal_value) {
@@ -269,7 +269,7 @@ void punchCounterReceiver::red_button_reset() {
     right_arm_number = 0;
     left_arm_number_count_down = 0;
     right_arm_number_count_down = 0;
-    punch_total_goal = 0;
+    punch_total_goal = default_R_L_total;
     set_goal_L = 0;
     set_goal_R = 0;
     mp3_start();
@@ -382,7 +382,6 @@ void punchCounterReceiver::set_digits(){
         uint8_t dl = 0;
      if(get_digits_ST() == digits_units_mode) {
         if(get_digits_dark_light_status() == DTS_light) {
-            //dl = seg_goal_xxxn;
             dl = seg_goal;
         } else {
             dl = seg_goal_xxxd;
@@ -392,28 +391,25 @@ void punchCounterReceiver::set_digits(){
         s7.divide_and_output(0, punch_total_goal, seg_goal, dl);
     } else if(get_digits_ST() == digits_tens_mode) {
         if(get_digits_dark_light_status() == DTS_light) {
-           // dl = seg_goal_xxnx;
             dl = seg_goal;
         } else {
             dl = seg_goal_xxdx;
         }
-        s7.divide_and_output(0, punch_total_goal, seg_goal, dl/*seg_goal*/);
+        s7.divide_and_output(0, punch_total_goal, seg_goal, dl);
     } else if(get_digits_ST() == digits_hundreds_mode) {
         if(get_digits_dark_light_status() == DTS_light) {
-            //dl = seg_goal_xnxx;
             dl = seg_goal;
         } else {
             dl = seg_goal_xdxx;
         }
-        s7.divide_and_output(0, punch_total_goal, seg_goal, dl/*seg_goal*/);   
+        s7.divide_and_output(0, punch_total_goal, seg_goal, dl);   
     } else if(get_digits_ST() == digits_thousands_mode) {
         if(get_digits_dark_light_status() == DTS_light) {
-            //dl = seg_goal_nxxx;
             dl = seg_goal;
         } else {
             dl = seg_goal_dxxx;
         }
-        s7.divide_and_output(0, punch_total_goal, seg_goal, dl/*seg_goal*/);   
+        s7.divide_and_output(0, punch_total_goal, seg_goal, dl);   
     }
         //Serial.println(punch_total_goal);
 }
@@ -508,18 +504,28 @@ void punchCounterReceiver::save_all_data_to_EEPROM() {
     EEPROM.write(punch_goalL, tempL);
     tempH = temp >> 8;
     EEPROM.write(punch_goalH, tempH);
+    //Serial.print(F("write punch total goal:"));
+    //Serial.println(temp);
     
     temp = left_arm_number;
-    tempL = temp && 0x00ff;
+    tempL = temp & 0x00ff;
     EEPROM.write(punchL_nowL, tempL);
     tempH = temp >> 8;
     EEPROM.write(punchL_nowH, tempH);
+    //Serial.print(F("write left arm number: "));
+    //Serial.println(temp);
+    //Serial.print(F("write left tempL: "));
+    //Serial.println(tempL);
+    //Serial.print("write left tempH: ");
+    //Serial.println(tempH);
     
     temp = right_arm_number;
-    tempL = temp && 0x00ff;
+    tempL = temp & 0x00ff;
     EEPROM.write(punchR_nowL, tempL);
     tempH = temp >> 8;
     EEPROM.write(punchR_nowH, tempH);
+    //Serial.print(F("write right arm number: "));
+    //Serial.println(temp);
 }
 
 void punchCounterReceiver::read_all_data_from_EEPROM() {
@@ -529,16 +535,22 @@ void punchCounterReceiver::read_all_data_from_EEPROM() {
     tempH = EEPROM.read(punch_goalH);
     punch_total_goal = (tempH << 8) + tempL;
     count_down = punch_total_goal / 2;
+    //Serial.print(F("read punch total goal: "));
+    //Serial.println(punch_total_goal);
     
     tempL = EEPROM.read(punchL_nowL);
     tempH = EEPROM.read(punchL_nowH);
     left_arm_number = (tempH << 8) + tempL;
     left_arm_number_count_down = count_down - left_arm_number;
-
+    Serial.print(F("read left_arm_number: "));
+    Serial.println(left_arm_number);
+    
     tempL = EEPROM.read(punchR_nowL);
     tempH = EEPROM.read(punchR_nowH);
     right_arm_number = (tempH << 8) + tempL;
     right_arm_number_count_down = count_down - right_arm_number;
+    //Serial.print(F("read right_arm_number: "));
+    //Serial.println(right_arm_number);
 }
 
 
