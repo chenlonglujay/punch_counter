@@ -65,9 +65,15 @@ function
   right arm: master teansmits "rREST." to slave,expresses master is reset, slave needs to clear punch data
 4.master receives pause from slave
   data format:
-  left arm: master receives "lPUSE." from slave ,expresses slave is pause
-  right arm: master receives"rPUSE." from slave ,expresses slave is pause
-  !!use BT module need to pair echo other!!
+  left arm: master receives "lPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch,    
+                     otherwise count increases too slow,master needs to play music or voice to remind player needs to punch quickly
+  right arm: master receives "rPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch,   
+                      otherwise count increases too slow, master needs to play music or voice to remind player needs to punch quickly
+5.master transmits goal value to slave                                                                                      
+  data format:                                                                                                              
+  left or right : master transmits "gxxxx." to slave,expresses master is setting goal number,this time slave will setting 
+  punch_total_goal value and reset punch count,ex:"g0500." that expresses goal is 500   
+!!use BT module need to pair echo other!!
 First,you need use AT_mode to pair BT module echo other,please refer to BT_pair document
 when you pair BT module succeed each other(master and slave),that can receive or transmit data
 !!!CAUTION!!!
@@ -197,6 +203,7 @@ private:
     bool set_goal_ST_switch;
     start_pause_done_ST SPD_L,SPD_R;
     bool transmit_reset_flag;
+    bool transmit_goal_flag;
 public:
     punchCounterReceiver();
     ~punchCounterReceiver();
@@ -257,5 +264,9 @@ public:
     void user_setting_goal_cancel();
     void user_set_transmit_reset_flag();
     bool user_get_transmit_reset_flag();
+    void user_set_transmit_goal_flag();
+    bool user_get_transmit_goal_flag();
+    int user_get_goal_L();
+    int user_get_goal_R();
 };
 #endif

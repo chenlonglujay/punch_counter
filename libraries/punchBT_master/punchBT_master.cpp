@@ -15,6 +15,8 @@ punchBT_master::punchBT_master(void){
 	serialN = serial1;
 	punch_pause = punch;
 	Serial.begin(9600);
+    transmitData_buf[0] = 'g';
+    transmitData_buf[5] = '.';
 }
 
 
@@ -204,4 +206,52 @@ void punchBT_master::Master_mode_transmit_reset() {
 		}  
 }
 
+void punchBT_master::Master_mode_transmit_goal(int goal_value) {
 
+    arrange_transmit_data(transmitData_buf, goal_value, 0);
+
+	if(mode == Master_mode) {
+		if(serialN	== serial1) {
+			Serial1.print(transmitData_buf);
+		} else if (serialN == serial2) {
+			Serial2.print(transmitData_buf);
+  		} else if (serialN == serial3) {
+			Serial3.print(transmitData_buf);
+		}
+			
+	}  
+
+}
+
+//change int data to char
+void punchBT_master::arrange_transmit_data(char *transmit_data_buf, int goal_value, bool show_data) {
+     int i = 0;                                                                                                                                      
+     int buf = goal_value;
+         if(show_data) {
+                Serial.print(F("goal_value:"));
+                Serial.println(goal_value);
+         }     
+     int unit[4] = {1000, 100, 10, 1};
+     uint8_t check = 0;
+         if(show_data) {
+                Serial.print(F("buf[0]:"));
+                Serial.print(transmit_data_buf[0]);
+                Serial.print("  ");
+         }     
+     for(i = 0; i < 4; i++) {
+        transmit_data_buf[i+1]= (buf / unit[i]) + '0';   //int to char
+        buf = buf % unit[i];
+                if(show_data) {
+                        Serial.print(F("buf"));
+                        Serial.print(F("["));
+                        Serial.print(i+1);
+                        Serial.print(F("]:"));
+                        Serial.print(transmit_data_buf[i+1]);
+                        Serial.print("  ");
+                }
+     }         
+         if(show_data) {
+                Serial.print(F("buf[5]:"));
+                Serial.println(transmit_data_buf[5]);
+            }  
+}          

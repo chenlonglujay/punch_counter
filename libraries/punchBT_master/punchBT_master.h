@@ -20,10 +20,15 @@
 //	right arm: slave receives "rREST." from master,expresses master is reset, slave needs to clear punch data
 //4.msater receives pause from slave
 //	data format:
-//	left arm: master receives "lPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch 
-//						count is too slow(too slow master needs to play music or voice to remind player needs to punch quickly)
-//	right arm: master receives "rPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch 
-//						count is too slow(too slow master needs to play music or voice to remind player needs to punch quickly)
+//	left arm: master receives "lPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch, 
+//						otherwise count increases too slow,master needs to play music or voice to remind player needs to punch quickly
+//	right arm: master receives "rPUSE." from slave ,expresses slave is pause, master needs to stop checking human punch, 
+//					    otherwise count increases too slow, master needs to play music or voice to remind player needs to punch quickly
+//5.master transmits goal value to slave
+//  data format:
+//  left or right : master transmits "gxxxx." to slave,expresses master is setting goal number,this time slave will setting
+// punch_total_goal value and reset punch count,ex:"g0500." that expresses goal is 500
+
 //!!use BT module need to pair echo other!!
 //First,you need use AT_mode to pair BT module echo other,please refer to BT_pair document
 //when you pair BT module succeed each other(master and slave),that can receive or transmit data
@@ -79,6 +84,7 @@ class punchBT_master
 {
 private:
 	uint8_t receiveData_buf[4];
+    char transmitData_buf[6];
 	int arrangeData;
 	uint8_t receiveSeq;
 	char val;
@@ -95,6 +101,8 @@ public:
 	void AT_mode_function();
 	int Master_mode_receive();
 	void Master_mode_transmit_reset();
+    void Master_mode_transmit_goal(int goal_value);
+    void arrange_transmit_data(char *transmit_data_buf, int goal_value, bool show_data);
 };
 
 #endif

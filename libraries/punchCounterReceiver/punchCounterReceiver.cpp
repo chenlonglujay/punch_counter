@@ -41,6 +41,7 @@ punchCounterReceiver::punchCounterReceiver(void) {
     SPD_L = start_mode;
     SPD_R = start_mode;
     transmit_reset_flag = false;
+    transmit_goal_flag = false;
 }
 
 punchCounterReceiver::~punchCounterReceiver(void) {
@@ -70,6 +71,7 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     SPD_L = start_mode;
     SPD_R = start_mode;
     transmit_reset_flag = false;
+    transmit_goal_flag = false;
 }
 
 
@@ -308,6 +310,8 @@ void punchCounterReceiver::set_right_arm_number_countdown(int value) {
                  
 
 void punchCounterReceiver::set_red_status_reset() {
+    user_set_transmit_reset_flag();
+    //Serial.println("set_red_status_reset"); 
     red_button_ST = red_reset_mode;
 }
                                                  
@@ -569,6 +573,7 @@ start_pause_done_ST punchCounterReceiver::user_get_start_pause_done_status_R() {
 }
 
 void punchCounterReceiver::user_setting_goal_ok() {
+    user_set_transmit_goal_flag();
     set_green_status_play_next();
     set_goal_mode(0);     
     set_digits_sw(0);  //turn off sw of digits drak or light     
@@ -581,8 +586,7 @@ void punchCounterReceiver::user_setting_goal_ok() {
     right_arm_number_count_down = 0;
     user_set_start_pause_done_status_L(pause_mode);
     user_set_start_pause_done_status_R(pause_mode);
-    set_goal_L = 0;
-    set_goal_R = 0;
+    set_R_L_goal();
 }
 
 void punchCounterReceiver::user_setting_goal_now() {
@@ -607,3 +611,21 @@ void punchCounterReceiver::user_set_transmit_reset_flag() {
 bool punchCounterReceiver::user_get_transmit_reset_flag() {
     return transmit_reset_flag;
 }
+
+void punchCounterReceiver::user_set_transmit_goal_flag() {
+    //Serial.println("user_set_transmit_goal_flag");
+    transmit_goal_flag = !transmit_goal_flag;
+}
+
+bool punchCounterReceiver::user_get_transmit_goal_flag() {
+    return transmit_goal_flag;
+}
+
+int punchCounterReceiver::user_get_goal_L() {
+    return set_goal_L;
+}
+
+int punchCounterReceiver::user_get_goal_R() {
+    return set_goal_R;
+}
+

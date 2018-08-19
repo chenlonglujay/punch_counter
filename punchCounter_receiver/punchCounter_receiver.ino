@@ -45,7 +45,7 @@ void red_condition() {
               }
         } else {           
               if(red_timer_counter >= reset_check_arrive) {                  
-                     //setting goal ok
+                     //setting goal ok                    
                      red_timer_counter = 0;
                      check_green_button_set = 1;    
                      PCR.user_setting_goal_ok();
@@ -133,6 +133,7 @@ void thread_initial() {
 }
 
 void BT_transmit() {   
+  
   if(PCR.user_get_transmit_reset_flag()) {
         punch_BT_L.Master_mode_transmit_reset();    
         punch_BT_R.Master_mode_transmit_reset();
@@ -140,30 +141,19 @@ void BT_transmit() {
         PCR.user_set_transmit_reset_flag();
   }
 
-  
- /*
- #if AT_Mode  
-    punch_BT_R.AT_mode_function();
-    //punch_BT_L.AT_mode_function();
- #else if receive_Mode
-  int reL = punch_BT_L.Master_mode_receive();
-  if(reL >0 && reL <10000){
-     Serial.print("receive val_left: ");
-     Serial.println(reL); 
-     if(reL == 5) {
-         if(!already_resetL) {   
-            Serial.println("master is reset send reset signal to slaveL");
-            punch_BT_L.Master_mode_transmit_reset();
-         }
-         already_resetL = true;
-     } else if(reL == 1) {
-         already_resetL = false;
-     }
-  } else if (reL == 10000){
-      Serial.println("slaveL is pause!!");
+  if(PCR.user_get_transmit_goal_flag()){
+      int goal_L = PCR.user_get_goal_L();
+      int goal_R = PCR.user_get_goal_R();
+      /*
+      Serial.print("goal_L:");
+      Serial.println(goal_L);
+      Serial.print("goal_R:");
+      Serial.println(goal_R);*/
+      punch_BT_L.Master_mode_transmit_goal(goal_L);
+      punch_BT_R.Master_mode_transmit_goal(goal_R);
+     // Serial.println("BT_transmit goal");
+     PCR.user_set_transmit_goal_flag();
   }
-*/
-  
 }
 
 void BT_receive() {
@@ -214,7 +204,7 @@ void SEG7_display() {
           PCR.set_green_cancel_reset();   
         } else if(PCR.get_red_button_ST() == red_reset_mode) {
             PCR.red_button_reset();    
-            PCR.user_set_transmit_reset_flag(); 
+            //PCR.user_set_transmit_reset_flag(); 
             PCR.show_punch_total_goal_on7SEG(PCR.user_get_punch_total_goal());      
         }
     } /*else {
@@ -326,13 +316,15 @@ void switch_goal_nowData_ISR() {
               static unsigned long last_interrupt_time = 0;
               unsigned long interrupt_time = millis();     
               if (interrupt_time - last_interrupt_time > 200) {      
-                  if(PCR.get_green_button_ST() != green_set_goal_mode) {
-                        //1 not reset,0 already reset check
+                  if(PCR.get_green_button_ST() != green_set_goal_mode) {                        
                          if(PCR.get_red_button_ST() != red_reset_check_mode && PCR.get_red_button_ST() != red_reset_mode ){
+                          //not reset
                                 PCR.change_red_status();                                                   
                          } else if(PCR.get_red_button_ST() == red_reset_check_mode && check_red_button_reset == 0) {
-                              //check_red_button_reset use to prevent to press red button already 3 seconds and let the  button release will go into here                                  
-                               PCR.set_red_status_reset();                         
+                              //check_red_button_reset use to prevent to press red button already 3 seconds and let the  button release will go into here    
+                               //do reset                            
+                               PCR.set_red_status_reset();        
+           
                          }  
                   }  else {
                       PCR.change_set_goal_digits();
