@@ -38,8 +38,8 @@ punchCounterReceiver::punchCounterReceiver(void) {
     goal_mode = false;
     SGST = setting_goal;
     set_goal_ST_switch = false;
-    SPD_L = pause_mode;
-    SPD_R = pause_mode;
+    SPD_L = start_mode;
+    SPD_R = start_mode;
 }
 
 punchCounterReceiver::~punchCounterReceiver(void) {
@@ -66,8 +66,8 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     goal_mode = false;
     SGST = setting_goal;
     set_goal_ST_switch = false;
-    SPD_L = pause_mode;
-    SPD_R = pause_mode;
+    SPD_L = start_mode;
+    SPD_R = start_mode;
 }
 
 
@@ -246,7 +246,6 @@ red_ST punchCounterReceiver::get_red_button_ST() {
 
 void punchCounterReceiver::change_red_status() {
     
-     //red_ST_counter++;
      if (red_ST_counter > 2) {
         red_ST_counter = 0;
         red_button_ST = red_goal_mode;
@@ -453,11 +452,6 @@ void punchCounterReceiver::inc_dec_digits_num() {
 
 }
 
-/*
-void punchCounterReceiver::punch_total_goal_reset() {
-    punch_total_goal = 0;
-} */
-
 
 void punchCounterReceiver::set_goal_mode(bool true_false) {
     goal_mode = true_false;
@@ -572,3 +566,34 @@ start_pause_done_ST punchCounterReceiver::user_get_start_pause_done_status_R() {
     return SPD_R;
 }
 
+void punchCounterReceiver::user_setting_goal_ok() {
+    set_green_status_play_next();
+    set_goal_mode(0);     
+    set_digits_sw(0);  //turn off sw of digits drak or light     
+    user_set_goal_ST();
+    red_button_ST = red_goal_mode;
+    red_ST_counter = 0; 
+    left_arm_number = 0;
+    right_arm_number = 0;
+    left_arm_number_count_down = 0;
+    right_arm_number_count_down = 0;
+    user_set_start_pause_done_status_L(pause_mode);
+    user_set_start_pause_done_status_R(pause_mode);
+    set_goal_L = 0;
+    set_goal_R = 0;
+}
+
+void punchCounterReceiver::user_setting_goal_now() {
+    set_green_status_goal();   
+    set_goal_mode(1);        
+    set_digits_sw(1);  //turn on sw of digits drak or light     
+    user_set_goal_ST();
+}
+
+void punchCounterReceiver::user_setting_goal_cancel() {
+    set_green_status_play_next();
+    set_goal_mode(0);     
+    set_digits_sw(0);  //turn off sw of digits drak or light     
+    user_set_goal_ST();
+    cancel_setting_punch_total_goal();
+}

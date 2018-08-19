@@ -251,7 +251,8 @@ public:
     void user_set_start_pause_done_status_R(start_pause_done_ST val);
     start_pause_done_ST user_get_start_pause_done_status_L();
     start_pause_done_ST user_get_start_pause_done_status_R();
-    //void punch_total_goal_reset();
-    //void set_goal_ok();
+    void user_setting_goal_ok();
+    void user_setting_goal_now();
+    void user_setting_goal_cancel();
 };
 #endif

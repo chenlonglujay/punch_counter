@@ -48,10 +48,7 @@ void red_condition() {
                      //setting goal ok
                      red_timer_counter = 0;
                      check_green_button_set = 1;    
-                     PCR.set_green_status_play_next();
-                     PCR.set_goal_mode(0);     
-                     PCR.set_digits_sw(0);  //turn off sw of digits drak or light     
-                     PCR.user_set_goal_ST();
+                     PCR.user_setting_goal_ok();
                }
      }  
    }
@@ -75,21 +72,14 @@ void green_condition() {
                    //setting goal
                     green_timer_counter = 0;
                     check_green_button_set = 1;        
-                    PCR.set_green_status_goal();   
-                    PCR.set_goal_mode(1);        
-                    PCR.set_digits_sw(1);  //turn on sw of digits drak or light     
-                    PCR.user_set_goal_ST();
+                    PCR.user_setting_goal_now();  
                 }
         } else {
                 if(green_timer_counter >= setGoal_arrive)  {
                     //setting goal cancel
                      green_timer_counter = 0;
                      check_green_button_set = 1;    
-                     PCR.set_green_status_play_next();
-                     PCR.set_goal_mode(0);     
-                     PCR.set_digits_sw(0);  //turn off sw of digits drak or light     
-                     PCR.user_set_goal_ST();
-                     PCR.cancel_setting_punch_total_goal();
+                      PCR.user_setting_goal_cancel();
                 }
         }
      }  
