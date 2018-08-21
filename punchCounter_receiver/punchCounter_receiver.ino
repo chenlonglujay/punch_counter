@@ -111,15 +111,15 @@ void thread_initial() {
   
   // Configure Thread_BT_transmit
   Thread_BT_transmit->onRun(BT_transmit);
-  Thread_BT_transmit->setInterval(150);
+  Thread_BT_transmit->setInterval(50);
   
   // Configure Thread_BT_receive
   Thread_BT_receive->onRun(BT_receive);
-  Thread_BT_receive->setInterval(150);
+  Thread_BT_receive->setInterval(30);
 
  // Configure Thread_SEG7
   Thread_SEG7->onRun(SEG7_display);
-  Thread_SEG7->setInterval(10);
+  Thread_SEG7->setInterval(5);
   
    // Configure Thread_mp3
   Thread_mp3->onRun(mp3_player);

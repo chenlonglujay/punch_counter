@@ -212,8 +212,10 @@ void get_count_transmitData(punchBT_slave *input) {
   bool show_data = false;
           
   if(PH_watch.get_start_pause_status()){       
-        if(PH_watch.get_punch_pause_switch_do_once_transmit()) {
-            transmit_data(input, punchCountBF, show_data);
+        if(PH_watch.get_punch_pause_switch_do_once_transmit()) {          
+            for(int i =0; i <5; i++){
+                transmit_data(input, punchCountBF, show_data);
+            }
             PH_watch.set_punch_pause_switch_do_once_transmit();
             return;
         }
@@ -234,8 +236,11 @@ void get_count_transmitData(punchBT_slave *input) {
  #endif
         }
         if( PH_watch.check_goal_done(punchGoal , punchCountNow) == goal_done){
-                transmit_pause(&punch_RL);         //change mode become to pause mode
-        }                    
+                    //change mode become to pause mode
+                     PH_watch.set_pause();                      //work likes pause mode     
+                      input->set_punch_pause(pause);             
+                      switchCheck_sp = watch_start;       //next push start/pause button down will go into start  
+        }     
         punchCountBF = punchCountNow;
     } 
     
