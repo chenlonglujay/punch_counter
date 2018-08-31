@@ -43,16 +43,28 @@ void timerEvent_start_pause() {
                       }
  #endif
                 }              
-          }                  
+          }                   
 }
 
 void timerEvent_reset_page(){
     arrange_reset_page();  
+    timerEvent_detect_punch();
 }
 
 void update_punch_timer() {         
          PH_watch.savePunchCountToEEPROM();
          PH_watch.saveTimerDataToEEPROM();         
+}
+
+void timerEvent_detect_punch(){
+  if(!PH_watch.get_punch_detect()) {
+    timer_detcet_punch_count ++;
+      if( timer_detcet_punch_count == detcet_punch_goal ) {
+      //Serial.println("set detect 1");
+        PH_watch.set_punch_detect(1);
+        timer_detcet_punch_count = 0;
+      }
+  }
 }
 
 void arrange_reset_page() {  
@@ -145,6 +157,7 @@ void punchCounter_initial() {
 #else slave_Mode  
         punch_RL.punchBT_slave_initial_set(Slave_mode, left_right);      
         punchCountNow  = PH_watch.get_punchCounter();       
+        punchCountBF = punchCountNow;
  #if    use_test_add_punch_count
           punchCountNow = punchCountNow + test_add_punch_count;
  #endif        
@@ -180,7 +193,7 @@ void BT_receive() {
   dws = punch_RL.Slave_mode_receive_goal_or_reset();
   switch (dws) {
     case do_reset:
-        Serial.println(F("do_reset"));
+        //Serial.println(F("do_reset"));
         PH_watch.set_which_page(page_reset);
         reset_data_count();
    break;   
@@ -213,15 +226,12 @@ void get_count_transmitData(punchBT_slave *input) {
           
   if(PH_watch.get_start_pause_status()){       
         if(PH_watch.get_punch_pause_switch_do_once_transmit()) {          
-            for(int i =0; i <5; i++){
+            for(int i =0; i <20; i++){
                 transmit_data(input, punchCountBF, show_data);
             }
             PH_watch.set_punch_pause_switch_do_once_transmit();
-            return;
         }
-        punchCountNow  = PH_watch.getHumanPunchCount(); 
-         //Serial.print("punchCount: ");
-         //Serial.println(punchCountNow);            
+        punchCountNow  = PH_watch.getHumanPunchCount();     
  #if    use_test_add_punch_count
           punchCountNow = punchCountNow + test_add_punch_count;
  #endif                 
@@ -229,7 +239,8 @@ void get_count_transmitData(punchBT_slave *input) {
 #if  auto_pause_switch                     
             clear_auto_pasue();
 #endif           
-            transmit_data(input, punchCountNow, show_data);
+            transmit_data(input, punchCountNow, show_data);   
+            punchCountBF = punchCountNow;         
         } else if (punchCountNow == punchCountBF)  {           
  #if  auto_pause_switch             
             autoPause = true;
@@ -240,8 +251,7 @@ void get_count_transmitData(punchBT_slave *input) {
                      PH_watch.set_pause();                      //work likes pause mode     
                       input->set_punch_pause(pause);             
                       switchCheck_sp = watch_start;       //next push start/pause button down will go into start  
-        }     
-        punchCountBF = punchCountNow;
+        }                     
     } 
     
     //if reset,slave transmit l0000. or r0000.

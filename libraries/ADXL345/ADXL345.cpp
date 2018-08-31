@@ -107,7 +107,7 @@ int ADXL345::get_xyzAxis_org(ch_xyzDataL xyzDataL, ch_xyzDataH xyzDataH){
 	tempL = I2C_read(ADXL345_xyzAxisDataL_option[xyzDataL]);
 	tempH = I2C_read(ADXL345_xyzAxisDataH_option[xyzDataH]);
 	axisData = (tempH << 8) + tempL;
-	delay(1);
+	//delay(1);
 	return axisData;
 }
 

@@ -35,6 +35,8 @@ get_punchCounter     		KEYWORD2
 get_punchGoal			KEYWORD2
 get_punch_pause_switch_do_once_transmit KEYWORD2
 set_punch_pause_switch_do_once_transmit KEYWORD2
+set_punch_detect        KEYWORD2
+get_punch_detect        KEYWORD2
 #######################################
 # Instances (KEYWORD2)
 #######################################

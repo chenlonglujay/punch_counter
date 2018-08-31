@@ -39,6 +39,7 @@ void punchCounterWatch::punchCounterWatch_initial_set(uint8_t sensitivityPin
 	//Serial.println(F("punch_goal initial:"));
 	//Serial.println(punch_goal);
     punch_pause_switch_do_once_transmit = 0;
+    set_punch_detect(1);
     set_pause();
 }
 
@@ -171,7 +172,13 @@ int punchCounterWatch::getSensitivity() {
 int punchCounterWatch::getHumanPunchCount() {
 	float SETY_temp = getSensitivity() / 1.2;
     int SETY = SETY_temp;
-	punchCounter = punch_count.get_punch_count(SETY,showDetail);
+	punchCounter = punch_count.get_punch_count(SETY, punch_detect, showDetail);
+    if((punchCounter - punch_counter_before) > 0) {
+        //Serial.print(F("punchCounter:"));
+        //Serial.println(punchCounter);
+        set_punch_detect(0);    //next time can't detect punch unitl timer arrives to set value
+    }
+    punch_counter_before = punchCounter; 
 	return punchCounter;	
 }
 
@@ -344,4 +351,14 @@ bool punchCounterWatch::get_punch_pause_switch_do_once_transmit() {
 
 void punchCounterWatch::set_punch_pause_switch_do_once_transmit() {
     punch_pause_switch_do_once_transmit = !punch_pause_switch_do_once_transmit;
+}
+
+void punchCounterWatch::set_punch_detect(bool detect) {
+    punch_detect = detect;
+    
+}
+
+ 
+bool punchCounterWatch::get_punch_detect() {
+    return punch_detect;
 }

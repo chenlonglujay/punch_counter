@@ -9,7 +9,7 @@
 #include <punchOLED.h>
 #include "OLED_database_watch.c"
 
-#define module_LR 1   //if this module wanna be Right module, please set this parameter as 1
+#define module_LR 0  //if this module wanna be Right module, please set this parameter as 1
 #if module_LR
   #define punch_RL punch_R                
   #define left_right right              
@@ -25,7 +25,7 @@
 
 punchBT_slave punch_RL;
 punchCounterWatch PH_watch;
-Timer tp,tc;
+Timer tp, tc;
 punchOLED punch_OLED;
 
 // ThreadController that will controll all threads
@@ -50,6 +50,9 @@ Thread* Thread_OLED = new Thread();
 #define second_check_arrive 2        //timer, TimerSmallestUnit  * second_check_arrive
 #define tenMin_check_arrive  second_check_arrive*60      //600s = 10 mintues
 
+
+int timer_detcet_punch_count = 0;
+#define  detcet_punch_goal  3 //   TimerSmallestUnit * detcet_punch_goal
 
 //change switch  status  of  start/pause button
 bool switchCheck_sp = true;

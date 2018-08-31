@@ -3,7 +3,8 @@
 //use this class can get human punch count
 //only use y-axis data to detect
 #include <ADXL345.h>
-#define defaultSensitivity 1000
+#define detect_punch_ok_value   700
+//#define detect_go_back_ok_value   500
 typedef enum setGravity{s2g=0,s4g,s8g,s16g} SG;
 typedef enum setDeivceID{SDO_1=0,SDO_0} devID;
 class PunchCounter:protected ADXL345
@@ -13,7 +14,6 @@ private:
 	int punch_counter;
 	uint8_t save_counter;
 	int saveNow,saveBefore;
-	int punchSensitivity;
 	void show_punch_count(int saveNow, int saveBefore, bool is2);
 	uint8_t set_gravity(SG CHGY);
 	uint8_t set_deviceID(devID dev_id);
@@ -21,7 +21,7 @@ public:
 	PunchCounter();
 	~PunchCounter();
 	void PunchCounter_initial(devID dev_id, SG CHGY, int now_punch_counter);
-	int get_punch_count(int tuneSensitivity, bool printSW);
+	int get_punch_count(int tuneSensitivity,bool detect, bool printSW);
 	void clear_punch_counter();
 	void set_measureMode();
 	void set_standbyMode();

@@ -76,6 +76,8 @@ private:
     bool change_page;
     transmit_BT_reset TBR;
     bool punch_pause_switch_do_once_transmit;
+    bool punch_detect;
+    int punch_counter_before;
 public:
 	punchCounterWatch();
 	~punchCounterWatch();
@@ -108,6 +110,8 @@ public:
     transmit_BT_reset get_transmit_BT_reset();
     bool get_punch_pause_switch_do_once_transmit();
     void set_punch_pause_switch_do_once_transmit();
+    void set_punch_detect(bool detect);
+    bool get_punch_detect();
 };
 
 #endif
