@@ -17,6 +17,10 @@ punchBT_master::punchBT_master(void){
 	Serial.begin(9600);
     transmitData_buf[0] = 'g';
     transmitData_buf[5] = '.';
+    BTL_rceive_check = 0; 
+    BTL_time_out = 0;
+    BTR_rceive_check = 0;
+    BTR_time_out = 0;
 }
 
 
@@ -35,6 +39,10 @@ void punchBT_master::punchBT_master_initial_set(ch_serial serial_num, ch_mode mo
   } else if (serialN == serial3) {
 			Serial3.begin(BT_baudrate);		
 	}
+    BTL_rceive_check = 0; 
+    BTL_time_out = 0;
+    BTR_rceive_check = 0;
+    BTR_time_out = 0;
 }
 
 void punchBT_master::AT_mode_function() {
@@ -76,6 +84,24 @@ if(mode == AT_mode) {
 
 int punchBT_master::Master_mode_receive(){
 	if(mode == Master_mode) {
+        if(dir == left){
+            if(get_BTL_receive_check() && BTL_time_out==1){
+                //Serial.println(F("BTL timeout!!"));
+                set_BTL_receive_check(0);
+                set_BTL_time_out(0);
+                receiveSeq = 0;
+	            return BT_nothing;  	
+            }
+        } else if(dir == right) {
+            if(get_BTR_receive_check() && BTR_time_out==1){
+                //Serial.println(F("BTR timeout!!"));
+                set_BTR_receive_check(0);
+                set_BTR_time_out(0);
+                receiveSeq = 0;
+	            return BT_nothing;  	
+            }
+        }
+
 			arrangeData = 0;
 			if(serialN	== serial1) {
 					if (Serial1.available()) {
@@ -113,8 +139,16 @@ int punchBT_master::Master_mode_receive(){
 void punchBT_master::receive_data_function(char *val, uint8_t *seq, uint8_t *receive_data_buf) {
 		uint8_t check = 0;
     char rl = dir;
+      
     if(*val == rl && *seq == 0) {
       *seq = 1;
+        if(rl == left){
+            set_BTL_receive_check(1);
+            //Serial.println(F("set_BTL_receive_check(1)"));
+        } else if(rl == right) {
+            set_BTR_receive_check(1);
+            //Serial.println(F("set_BTR_receive_check(1)"));
+        }
     } else if(*seq == 1) {
 			//Serial.print(*val);
       if(*val == 'P') {
@@ -168,7 +202,18 @@ void punchBT_master::receive_data_function(char *val, uint8_t *seq, uint8_t *rec
        	}
 			}
     } else if(*val == '.' && *seq == 5) {     
-        *seq = 6;         
+        *seq = 6;    
+        if(rl == left){
+            set_BTL_receive_check(0);
+            set_BTL_time_out(0);
+            //Serial.println(F("set_BTL_receive_check(0)"));
+            //Serial.println(F("-----------------------"));
+        } else if(rl == right) {
+            set_BTR_receive_check(0);
+            //Serial.println(F("set_BTR_receive_check(0)"));
+            //Serial.println(F("-----------------------"));
+        }
+     
     }    
 }
 
@@ -255,3 +300,29 @@ void punchBT_master::arrange_transmit_data(char *transmit_data_buf, int goal_val
                 Serial.println(transmit_data_buf[5]);
             }  
 }          
+
+void punchBT_master::set_BTL_receive_check(bool value) {
+    BTL_rceive_check = value;
+}
+    
+bool punchBT_master::get_BTL_receive_check() {
+    return BTL_rceive_check;
+}
+
+void punchBT_master::set_BTL_time_out(bool value) {
+     BTL_time_out = value;
+}
+
+void punchBT_master::set_BTR_receive_check(bool value) {
+    BTR_rceive_check = value;
+}
+    
+bool punchBT_master::get_BTR_receive_check() {
+    return BTR_rceive_check;
+}
+
+void punchBT_master::set_BTR_time_out(bool value) {
+     BTR_time_out = value;
+}
+
+                                                                                                               

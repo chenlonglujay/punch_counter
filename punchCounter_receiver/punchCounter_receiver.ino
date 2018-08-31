@@ -4,6 +4,7 @@
 void setup() {
   Serial.begin(9600);  
   t1.every(TimerSmallestUnit,timerEvent);    
+  t_BT_timeout.every(TimerSmallestUnit, checkBT_time_out);    
   PCR.initial_punchCounterReceiver(volume_knob_pin, Segcom_Low, Segcom_High         
                                          , data_Pin, latch_Pin, clock_Pin ) ;
   PCR.initial_punchCounterMp3();                                     
@@ -97,12 +98,36 @@ void digits_sw_condition() {
      }
 }
 
+ void checkBT_time_out() {
+    if(punch_BT_L.get_BTL_receive_check()){
+       BTL_timer_counter++;
+       if(BTL_timer_counter == BT_receive_time_out) {
+          BTL_timer_counter = 0;
+          punch_BT_L.set_BTL_time_out(1);
+       }
+    } else {
+       BTL_timer_counter = 0;
+    }
+    
+  if(punch_BT_R.get_BTR_receive_check()){
+       BTR_timer_counter++;
+       if(BTR_timer_counter == BT_receive_time_out) {
+          BTR_timer_counter = 0;
+          punch_BT_R.set_BTR_time_out(1);
+           //Serial.println(F("BTR TIMEOUT"));
+       }
+    } else {
+       BTR_timer_counter = 0;
+    }
+ }
+ 
 void loop() {
  #if AT_Mode  
     //punch_BT_L.AT_mode_function();
     punch_BT_R.AT_mode_function();
  #else if  Master_Mode
      t1.update();
+     t_BT_timeout.update();
      controll.run();
  #endif
 }
@@ -160,12 +185,12 @@ void BT_receive() {
   int reL = punch_BT_L.Master_mode_receive();
   int reR = punch_BT_R.Master_mode_receive();  
   int total_half = PCR.user_get_punch_total_goal()/2;
-   
+
    if(reL >= 0 && reL <  total_half ){
-    //Serial.println("reL");
     PCR.user_set_start_pause_done_status_L(start_mode);  
      PCR.set_left_arm_number_inc(reL);         
      PCR.set_left_arm_number_countdown(reL);    
+     
    } else if(reL == 10000){
     //pause
     //Serial.println("pause L");

@@ -225,11 +225,11 @@ void get_count_transmitData(punchBT_slave *input) {
   bool show_data = false;
           
   if(PH_watch.get_start_pause_status()){       
-        if(PH_watch.get_punch_pause_switch_do_once_transmit()) {          
-            for(int i =0; i <20; i++){
-                transmit_data(input, punchCountBF, show_data);
-            }
+        if(PH_watch.get_punch_pause_switch_do_once_transmit()) {       
+             transmit_data(input, punchCountBF, show_data);
             PH_watch.set_punch_pause_switch_do_once_transmit();
+            delay(10);
+            return;
         }
         punchCountNow  = PH_watch.getHumanPunchCount();     
  #if    use_test_add_punch_count

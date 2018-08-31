@@ -47,13 +47,16 @@ uint8_t S7L_states = 0, S7R_states =0;
 //Timer
 #include <Timer.h>
 #define TimerSmallestUnit 100 //ms
-Timer t1;
+Timer t1,t_BT_timeout;
 int red_timer_counter = 0;
 #define reset_check_arrive 30            //timer, TimerSmallestUnit  * reset_check_arrive
 int  green_timer_counter = 0;
 #define setGoal_arrive 30            //timer, TimerSmallestUnit  * setGoal_arrive
 int  sw_timer_counter = 0;
 #define set_sw_arrive 5            //timer, TimerSmallestUnit  * set_sw_arrive
+#define BT_receive_time_out  20 //timer, TimerSmallestUnit  * BT_receive_time_out
+int  BTL_timer_counter = 0;
+int  BTR_timer_counter = 0;
 //----------------------------------------------------
 
 //----------------------------------------------------

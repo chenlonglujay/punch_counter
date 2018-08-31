@@ -94,6 +94,10 @@ private:
 	uint8_t serialN;
 	void receive_data_function(char *val, uint8_t *seq, uint8_t *receive_data_buf);
 	void arrange_receive_data(uint8_t *receive_data, int *arrange_data);
+    bool BTL_rceive_check;
+    bool BTR_rceive_check;
+    bool BTL_time_out;
+    bool BTR_time_out;
 public:
 	punchBT_master();
 	~punchBT_master();
@@ -103,6 +107,12 @@ public:
 	void Master_mode_transmit_reset();
     void Master_mode_transmit_goal(int goal_value);
     void arrange_transmit_data(char *transmit_data_buf, int goal_value, bool show_data);
+    void set_BTL_receive_check(bool value);
+    bool get_BTL_receive_check();
+    void set_BTR_receive_check(bool value);
+    bool get_BTR_receive_check();
+    void set_BTL_time_out(bool value);
+    void set_BTR_time_out(bool value);
 };
 
 #endif
