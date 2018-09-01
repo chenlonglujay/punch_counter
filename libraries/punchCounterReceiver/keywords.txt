@@ -69,6 +69,20 @@ user_set_transmit_goal_flag     KEYWORD2
 user_get_transmit_goal_flag     KEYWORD2
 user_get_goal_L                 KEYWOED2
 user_get_goal_R                 KEYWORD2
+play_cancel_voice               KEYWORD2
+set_play_cancel_voice           KEYWORD2
+play_ridicule_voice             KEYWORD2
+set_play_ridicule_voice         KEYWORD2
+get_play_ridicule_voice         KEYWORD2
+set_5secs_check_flag            KEYWORD2
+get_5secs_check_flag            KEYWORD2
+check_start_stop_punch          KEYWORD2    
+set_check_5secs_L               KEYWORD2
+set_check_5secs_R               KEYWORD2
+get_check_5secs_L               KEYWORD2
+get_check_5secs_R               KEYWORD2
+set_play_once                   KEYWORD2
+get_play_once                   KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

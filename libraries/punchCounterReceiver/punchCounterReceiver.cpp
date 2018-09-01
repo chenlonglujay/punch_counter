@@ -42,6 +42,15 @@ punchCounterReceiver::punchCounterReceiver(void) {
     SPD_R = start_mode;
     transmit_reset_flag = false;
     transmit_goal_flag = false;
+    play_mp3_cancel_voice = false;
+    play_mp3_ridicule_voice = false;
+    start_check_stop_5secs = false;
+    punchL_BF = 0;
+    punchR_BF = 0;
+    ridicule_voice_counter = 0;
+    checkL_5secs = false;
+    checkR_5secs = false;
+    play_once = false;
 }
 
 punchCounterReceiver::~punchCounterReceiver(void) {
@@ -72,6 +81,15 @@ void punchCounterReceiver::initial_punchCounterReceiver(uint8_t volume_Knob, uin
     SPD_R = start_mode;
     transmit_reset_flag = false;
     transmit_goal_flag = false;
+    play_mp3_cancel_voice = false;
+    play_mp3_ridicule_voice = false;
+    punchL_BF = 0;
+    punchR_BF = 0;
+    start_check_stop_5secs = false;
+    ridicule_voice_counter = 0;
+    checkL_5secs = false;
+    checkR_5secs = false;
+    play_once = false;
 }
 
 
@@ -219,7 +237,7 @@ void punchCounterReceiver::set_mp3_volume(uint8_t value){
 }
 
 void punchCounterReceiver::mp3_play_selected(int number) {
-    myDFPlayer.play(number);  //Play the first mp3
+    myDFPlayer.play(number); 
 }
 
 void punchCounterReceiver::mp3_play_previous() {
@@ -278,7 +296,7 @@ void punchCounterReceiver::red_button_reset() {
     set_goal_L = 0;
     set_goal_R = 0;
     mp3_start();
-    mp3_play_selected(6);
+    mp3_play_selected(mp3_reset);
 }
  
 void punchCounterReceiver::red_button_reset_check() {
@@ -317,7 +335,7 @@ void punchCounterReceiver::set_red_status_reset() {
                                                  
 void punchCounterReceiver::set_red_status_goal() {
     red_button_ST = red_goal_mode;
-    red_ST_counter = 0; 
+    red_ST_counter = 0;
 }
 
 void punchCounterReceiver::set_green_status_goal() {
@@ -573,6 +591,7 @@ start_pause_done_ST punchCounterReceiver::user_get_start_pause_done_status_R() {
 }
 
 void punchCounterReceiver::user_setting_goal_ok() {
+    mp3_play_selected(mp3_setok);
     user_set_transmit_goal_flag();
     set_green_status_play_next();
     set_goal_mode(0);     
@@ -597,6 +616,7 @@ void punchCounterReceiver::user_setting_goal_now() {
 }
 
 void punchCounterReceiver::user_setting_goal_cancel() {
+    mp3_play_selected(mp3_set_cancel);
     set_green_status_play_next();
     set_goal_mode(0);     
     set_digits_sw(0);  //turn off sw of digits drak or light     
@@ -629,3 +649,104 @@ int punchCounterReceiver::user_get_goal_R() {
     return set_goal_R;
 }
 
+
+void punchCounterReceiver::play_cancel_voice() {
+    if(play_mp3_cancel_voice) {
+       mp3_play_selected(mp3_set_cancel);
+       set_play_cancel_voice(0);
+    } 
+}    
+
+void punchCounterReceiver::set_play_cancel_voice(bool value) {
+    play_mp3_cancel_voice = value;
+}
+
+void punchCounterReceiver::play_ridicule_voice() {
+
+    if(get_play_once()){
+        ridicule_voice_counter++;
+        if(ridicule_voice_counter == 6) {
+            ridicule_voice_counter = 0;
+        }
+        mp3_play_selected(ridicule_voice_counter);
+    }
+}
+
+void punchCounterReceiver::set_play_ridicule_voice(bool value) {
+    play_mp3_ridicule_voice = value;
+}
+
+bool punchCounterReceiver::get_play_ridicule_voice() {
+    return play_mp3_ridicule_voice;
+}
+
+void punchCounterReceiver::set_5secs_check_flag(bool value) {
+    start_check_stop_5secs = value;
+}
+
+bool punchCounterReceiver::get_5secs_check_flag() {
+    return start_check_stop_5secs;
+}
+
+void punchCounterReceiver::check_start_stop_punch(int numL, int numR) {
+    bool LC = get_check_5secs_L();
+    bool RC = get_check_5secs_R();
+    if(LC && RC) {
+        //Serial.println(F("both check"));
+        //both are in start mode
+       if(numL==punchL_BF && numR==punchR_BF) {
+           set_5secs_check_flag(1);  //timer start to calculate 
+       } else {
+           set_5secs_check_flag(0);  //timer stop to calculate
+           set_play_ridicule_voice(0); 
+       } 
+    } else if (LC && !RC) {
+        //LC start,RC pause
+       //Serial.println(F("L check"));
+       if(numL==punchL_BF) {
+           set_5secs_check_flag(1);  //timer start to calculate 
+        } else if (numL>punchL_BF) {
+           set_5secs_check_flag(0);  //timer stop to calculate
+           set_play_ridicule_voice(0); 
+        }
+    } else if (!RC && LC) {
+        //RC start,LC pause
+        //Serial.println(F("R check"));
+       if(numR==punchR_BF) {
+           set_5secs_check_flag(1);  //timer start to calculate 
+        } else if (numR>punchR_BF) {
+           set_5secs_check_flag(0);  //timer stop to calculate
+           set_play_ridicule_voice(0); 
+        }
+    } else {
+           //Serial.println(F("no check"));
+           set_5secs_check_flag(0);  //timer stop to calculate
+           set_play_ridicule_voice(0); 
+    }
+    punchL_BF = numL;
+    punchR_BF = numR;
+}
+
+void punchCounterReceiver::set_check_5secs_L(bool value) {
+    checkL_5secs = value;
+}
+
+void punchCounterReceiver::set_check_5secs_R(bool value) {
+    checkR_5secs = value;
+}
+
+bool punchCounterReceiver::get_check_5secs_L() {
+    return checkL_5secs;
+}
+
+bool punchCounterReceiver::get_check_5secs_R() {
+    return checkR_5secs;
+}
+
+void punchCounterReceiver::set_play_once(bool value) {
+    play_once = value;
+}
+
+bool punchCounterReceiver::get_play_once() {
+    return play_once;
+}

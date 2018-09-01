@@ -109,7 +109,12 @@ if you get and set BT modlue succeed ,then you can let another BT module to use 
               //punch_BT_R.AT_mode_function();
                     punch_BT_L.AT_mode_function();
             }
+about mp3
+track0001
+track0002
+...
 */
+
 #ifndef PUNCHCOUNTERRECEIVER_h
 #define PUNCHCOUNTERRECEIVER_h
 #include <EEPROM.h>
@@ -118,13 +123,14 @@ if you get and set BT modlue succeed ,then you can let another BT module to use 
 #define default_L_MAX 4999
 #define default_R_L_total 9998
 typedef enum mp3{
-    shutup = 1
-   ,useless
-   ,happy_bear
-   ,ridicule
-   ,uselesshere
-   ,reset
-   ,setok
+    mp3_shutup = 1
+   ,mp3_useless
+   ,mp3_happy_bear
+   ,mp3_ridicule
+   ,mp3_uselesshere
+   ,mp3_reset
+   ,mp3_setok
+   ,mp3_set_cancel
 } mp3_all;
 
 typedef enum red_status{
@@ -146,7 +152,6 @@ typedef enum green_status{
 green_play_next_mode = 0
 ,green_set_goal_mode
 ,green_cancel_reset_mode
-/*,green_inc_dec_num_mode*/
 }green_ST;
 
 typedef enum set_goal_status{
@@ -204,6 +209,13 @@ private:
     start_pause_done_ST SPD_L,SPD_R;
     bool transmit_reset_flag;
     bool transmit_goal_flag;
+    bool play_mp3_cancel_voice;
+    bool play_mp3_ridicule_voice;
+    bool start_check_stop_5secs;
+    int punchL_BF,punchR_BF;
+    uint8_t ridicule_voice_counter;
+    bool checkL_5secs,checkR_5secs;
+    bool play_once;
 public:
     punchCounterReceiver();
     ~punchCounterReceiver();
@@ -268,5 +280,19 @@ public:
     bool user_get_transmit_goal_flag();
     int user_get_goal_L();
     int user_get_goal_R();
+    void play_cancel_voice();
+    void set_play_cancel_voice(bool value);
+    void play_ridicule_voice();
+    void set_play_ridicule_voice(bool value);
+    bool get_play_ridicule_voice();
+    void set_5secs_check_flag(bool value);
+    bool get_5secs_check_flag();
+    void check_start_stop_punch(int numL, int numR);
+    void set_check_5secs_L(bool value);
+    void set_check_5secs_R(bool value);
+    bool get_check_5secs_L();
+    bool get_check_5secs_R();
+    void set_play_once(bool value);
+    bool get_play_once();
 };
 #endif

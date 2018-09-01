@@ -47,7 +47,7 @@ uint8_t S7L_states = 0, S7R_states =0;
 //Timer
 #include <Timer.h>
 #define TimerSmallestUnit 100 //ms
-Timer t1,t_BT_timeout;
+Timer t1,t_BT_timeout, t_5secs;
 int red_timer_counter = 0;
 #define reset_check_arrive 30            //timer, TimerSmallestUnit  * reset_check_arrive
 int  green_timer_counter = 0;
@@ -57,6 +57,11 @@ int  sw_timer_counter = 0;
 #define BT_receive_time_out  20 //timer, TimerSmallestUnit  * BT_receive_time_out
 int  BTL_timer_counter = 0;
 int  BTR_timer_counter = 0;
+#define Timer_check_user_stop_unit 500 //ms
+#define t_5secs_arrive_num 10
+int t_5secs_counter = 0;
+#define voice_interval_time 15
+int voice_interval_counter = 0;
 //----------------------------------------------------
 
 //----------------------------------------------------
